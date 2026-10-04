@@ -29,8 +29,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeverBlock;
 import net.minecraft.world.level.block.state.properties.AttachFace;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
@@ -49,16 +48,14 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
  * checked "an unpowered block reads zero" would pass on a node that always returned zero, so every case
  * here has a powered and an unpowered state.
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class McRedstoneGameTest {
+public final class McRedstoneGameTest implements FabricGameTest {
 
-    private McRedstoneGameTest() {
+    public McRedstoneGameTest() {
     }
 
     // ---- redstone ----------------------------------------------------------------------------
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void readsPowerFromARedstoneBlock(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos source = helper.absolutePos(new BlockPos(1, 2, 1));
@@ -92,8 +89,7 @@ public final class McRedstoneGameTest {
      * is the whole reason the two nodes exist, and it is the pair of cases here: without the lever, Direct
      * Signal would only ever be asserted as zero and a node that always returned zero would pass.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void directSignalIgnoresWeakPower(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
 
@@ -141,8 +137,7 @@ public final class McRedstoneGameTest {
      * <p>Both read zero on the number alone, which is exactly why the node has a separate
      * {@code hasOutput}.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void comparatorReadsContainerFullness(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos chest = helper.absolutePos(new BlockPos(1, 2, 1));
@@ -172,8 +167,7 @@ public final class McRedstoneGameTest {
 
     // ---- enchantments ------------------------------------------------------------------------
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void readsAndAddsEnchantments(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         ItemStack sword = new ItemStack(Items.DIAMOND_SWORD);
@@ -240,8 +234,7 @@ public final class McRedstoneGameTest {
 
     // ---- entity raycast ----------------------------------------------------------------------
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void raycastFindsAnEntity(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         Entity pig = helper.spawn(EntityType.PIG, new BlockPos(2, 2, 2));

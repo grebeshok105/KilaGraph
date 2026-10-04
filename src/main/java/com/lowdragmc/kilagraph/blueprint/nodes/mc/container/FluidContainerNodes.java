@@ -15,9 +15,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import com.lowdragmc.kilagraph.util.KGCapabilityAdapters;
+import dev.architectury.fluid.FluidStack;
+import com.lowdragmc.lowdraglib2.utils.fluids.IFluidHandler;
 
 /**
  * Fluid tanks: finding one, reading it, and moving fluid in or out.
@@ -66,8 +66,7 @@ public final class FluidContainerNodes {
                 return;
             }
             Direction from = ctx.getInput("side", Direction.class, Direction.NORTH);
-            IFluidHandler handler =
-                    Capabilities.FluidHandler.BLOCK.getCapability(world, at, null, null, from);
+            IFluidHandler handler = KGCapabilityAdapters.fluidHandlerAt(world, at, from);
             ctx.setOutput("out", handler);
             ctx.setOutput("found", handler != null);
         }
@@ -109,7 +108,7 @@ public final class FluidContainerNodes {
 
         @InputPort public IFluidHandler container;
         @InputPort public int tank = 0;
-        @OutputPort public FluidStack out = FluidStack.EMPTY;
+        @OutputPort public FluidStack out = FluidStack.empty();
         @OutputPort public int capacity;
         @OutputPort public boolean empty;
 
@@ -118,7 +117,7 @@ public final class FluidContainerNodes {
             IFluidHandler h = handler(ctx);
             int tank = ctx.getInt("tank", 0);
             if (h == null || tank < 0 || tank >= h.getTanks()) {
-                ctx.setOutput("out", FluidStack.EMPTY);
+                ctx.setOutput("out", FluidStack.empty());
                 ctx.setOutput("capacity", 0);
                 ctx.setOutput("empty", true);
                 return;
@@ -157,7 +156,7 @@ public final class FluidContainerNodes {
         @ExecOutputPort public ExecutionFlow next;
 
         @InputPort public IFluidHandler container;
-        @InputPort public FluidStack fluid = FluidStack.EMPTY;
+        @InputPort public FluidStack fluid = FluidStack.empty();
         @InputPort public boolean simulate = false;
         @OutputPort public int filled;
         @OutputPort public boolean ok;
@@ -165,7 +164,7 @@ public final class FluidContainerNodes {
         @Override
         public void execute(ExecContext ctx) {
             IFluidHandler h = ctx.getInput("container", IFluidHandler.class, null);
-            FluidStack give = ctx.getInput("fluid", FluidStack.class, FluidStack.EMPTY);
+            FluidStack give = ctx.getInput("fluid", FluidStack.class, FluidStack.empty());
             if (h == null || give == null || give.isEmpty()) {
                 ctx.setOutput("filled", 0);
                 McActions.done(ctx, false);
@@ -203,7 +202,7 @@ public final class FluidContainerNodes {
         @InputPort public IFluidHandler container;
         @InputPort public int amount = 1000;
         @InputPort public boolean simulate = false;
-        @OutputPort public FluidStack out = FluidStack.EMPTY;
+        @OutputPort public FluidStack out = FluidStack.empty();
         @OutputPort public boolean ok;
 
         @Override
@@ -211,7 +210,7 @@ public final class FluidContainerNodes {
             IFluidHandler h = ctx.getInput("container", IFluidHandler.class, null);
             int amount = ctx.getInt("amount", 1000);
             if (h == null || amount <= 0) {
-                ctx.setOutput("out", FluidStack.EMPTY);
+                ctx.setOutput("out", FluidStack.empty());
                 McActions.done(ctx, false);
                 return;
             }

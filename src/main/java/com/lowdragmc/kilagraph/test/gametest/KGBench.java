@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 public final class KGBench {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private KGBench() {}
+    public KGBench() {}
 
     /** Timed passes per measurement; the fastest one is reported. See {@link #measure}. */
     private static final int TIMED_PASSES = 5;

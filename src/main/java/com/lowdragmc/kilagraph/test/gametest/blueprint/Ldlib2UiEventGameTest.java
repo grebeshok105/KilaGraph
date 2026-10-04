@@ -19,8 +19,7 @@ import com.lowdragmc.lowdraglib2.gui.ui.event.UIEvents;
 import com.lowdragmc.lowdraglib2.nodegraphtookit.api.variable.VariableKind;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertEq;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertFalse;
@@ -49,10 +48,9 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertTrue
  * behave identically on both sides. Rendered layout and the style cascade are not testable here and
  * are not tested here.
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class Ldlib2UiEventGameTest {
+public final class Ldlib2UiEventGameTest implements FabricGameTest {
 
-    private Ldlib2UiEventGameTest() {
+    public Ldlib2UiEventGameTest() {
     }
 
     /**
@@ -63,8 +61,7 @@ public final class Ldlib2UiEventGameTest {
      *
      * <p>Building must not run the handler; clicking must.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void handlerRunsOnlyWhenTheEventFires(GameTestHelper helper) {
         var g = clickGraph();
         var exec = new GraphExecutor(g.graph());
@@ -89,8 +86,7 @@ public final class Ldlib2UiEventGameTest {
      * build a <em>second</em> button, and the handler would style that one while the player stared at
      * the first. Everything would be wired correctly and nothing would happen.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void theHandlerActsOnTheClickedInstance(GameTestHelper helper) {
         var g = clickGraph();
         var exec = new GraphExecutor(g.graph());
@@ -120,8 +116,7 @@ public final class Ldlib2UiEventGameTest {
      * did not clear the pull cache, {@code getText} would still answer {@code "before"} — the value
      * memoised while the tree was being assembled.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void theHandlerSeesCurrentValuesNotBuildTimeOnes(GameTestHelper helper) {
         var g = KGGraphBuilder.blueprint()
                 .add("entry", EntryNode.class)
@@ -165,8 +160,7 @@ public final class Ldlib2UiEventGameTest {
      * re-run the rest of the build on every click. The two classes distinguish the cases, which a
      * single flag could not.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void registrationAndDispatchTakeDifferentOutputs(GameTestHelper helper) {
         var g = KGGraphBuilder.blueprint()
                 .add("entry", EntryNode.class)
@@ -206,8 +200,7 @@ public final class Ldlib2UiEventGameTest {
     }
 
     /** A click dispatched an odd number of times must leave a toggled class on, not off. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void oneEventCausesExactlyOneDispatch(GameTestHelper helper) {
         var g = KGGraphBuilder.blueprint()
                 .add("entry", EntryNode.class)
@@ -244,8 +237,7 @@ public final class Ldlib2UiEventGameTest {
      * can inspect, or inspecting a drag nobody can start, are both dead ends. The payload deliberately
      * survives untyped — that is what lets a UI drag whatever it means by "an item".</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void aDragCarriesItsPayloadToTheDropHandler(GameTestHelper helper) {
         var g = KGGraphBuilder.blueprint()
                 .add("entry", EntryNode.class)
@@ -285,8 +277,7 @@ public final class Ldlib2UiEventGameTest {
     }
 
     /** Starting a drag on an unmounted element refuses rather than throwing. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void aDragOnAnUnmountedElementRefuses(GameTestHelper helper) {
         var g = KGGraphBuilder.blueprint()
                 .add("entry", EntryNode.class)

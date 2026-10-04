@@ -18,8 +18,7 @@ import com.lowdragmc.lowdraglib2.nodegraphtookit.api.type.TypeHandles;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertEq;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertFalse;
@@ -44,15 +43,13 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertTrue
  *       same graph produces the same order twice.</li>
  * </ul>
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class Ldlib2UiSyncGameTest {
+public final class Ldlib2UiSyncGameTest implements FabricGameTest {
 
-    private Ldlib2UiSyncGameTest() {
+    public Ldlib2UiSyncGameTest() {
     }
 
     /** A declared sync value exists, is named, and is typed as the option said. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void aSyncValueIsDeclaredOnItsElement(GameTestHelper helper) {
         var g = syncGraph();
         var exec = new GraphExecutor(g.graph());
@@ -73,8 +70,7 @@ public final class Ldlib2UiSyncGameTest {
      * before re-reading. Without that this test would see 7 twice — the value memoised while the tree
      * was being assembled.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void aSourcedSyncValueTracksItsExpression(GameTestHelper helper) {
         var g = KGGraphBuilder.blueprint()
                 .add("entry", EntryNode.class)
@@ -107,8 +103,7 @@ public final class Ldlib2UiSyncGameTest {
     }
 
     /** A sync value with no concrete type is refused rather than registered unencodable. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void anUntypedSyncValueIsRefused(GameTestHelper helper) {
         var g = KGGraphBuilder.blueprint()
                 .add("entry", EntryNode.class)
@@ -131,8 +126,7 @@ public final class Ldlib2UiSyncGameTest {
      * {@code setMenu} on the server and screen init on the client, both of which belong to whatever
      * is hosting the UI. Pinning it here keeps the node's documentation honest.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void syncValuesJoinAndLeaveTheManagerWithTheirElement(GameTestHelper helper) {
         var g = KGGraphBuilder.blueprint()
                 .add("entry", EntryNode.class)
@@ -187,8 +181,7 @@ public final class Ldlib2UiSyncGameTest {
      * <p>Calling the executor directly is the honest way to test this in one process: it is exactly
      * what {@code UISyncManager.handEvent} does when a call arrives, minus the packet.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void anRpcCallReachesTheGraphAndReturnsAValue(GameTestHelper helper) {
         var g = KGGraphBuilder.blueprint()
                 .add("entry", EntryNode.class)
@@ -225,8 +218,7 @@ public final class Ldlib2UiSyncGameTest {
     }
 
     /** A message handler receives its payload, from a send on the same side. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void aMessageHandlerReceivesItsPayload(GameTestHelper helper) {
         var g = KGGraphBuilder.blueprint()
                 .add("entry", EntryNode.class)

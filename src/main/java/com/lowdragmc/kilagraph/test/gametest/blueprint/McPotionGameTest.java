@@ -19,8 +19,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.addNode;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertEq;
@@ -38,8 +37,7 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
  * wrong field would disagree. The removal nodes change a live entity, so those assertions are on the
  * entity afterwards, never on {@code ok} alone.
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class McPotionGameTest {
+public final class McPotionGameTest implements FabricGameTest {
 
     private static final ResourceLocation SWIFTNESS = ResourceLocation.parse("minecraft:swiftness");
     private static final ResourceLocation STRONG_SWIFTNESS = ResourceLocation.parse("minecraft:strong_swiftness");
@@ -47,13 +45,12 @@ public final class McPotionGameTest {
     private static final ResourceLocation STRENGTH = ResourceLocation.parse("minecraft:strength");
     private static final ResourceLocation NOT_A_THING = ResourceLocation.parse("kilagraph:nope");
 
-    private McPotionGameTest() {
+    public McPotionGameTest() {
     }
 
     // ---- potions -------------------------------------------------------------------------------
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void potionsAreBuiltAndRead(GameTestHelper helper) {
         var made = node(PotionNodes.Make.class, "item", Items.POTION, "potion", SWIFTNESS);
         assertTrue(helper, "making a swiftness potion worked", eval(made, "ok", Boolean.class));
@@ -94,8 +91,7 @@ public final class McPotionGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void customEffectsStackOnTheBase(GameTestHelper helper) {
         ItemStack potion = eval(node(PotionNodes.Make.class, "item", Items.POTION, "potion", SWIFTNESS),
                 "out", ItemStack.class);
@@ -154,8 +150,7 @@ public final class McPotionGameTest {
      * <p>Both nodes report what they changed, not what they attempted, so removing an effect that is not
      * there is {@code false} — that is the branch a graph hits when it clears a buff it never applied.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void effectsAreRemoved(GameTestHelper helper) {
         LivingEntity pig = helper.spawn(EntityType.PIG, new BlockPos(1, 2, 1));
 

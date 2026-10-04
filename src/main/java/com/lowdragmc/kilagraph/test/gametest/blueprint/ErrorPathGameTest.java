@@ -14,8 +14,7 @@ import com.lowdragmc.kilagraph.graph.exec.GraphExecutor;
 import com.lowdragmc.kilagraph.test.gametest.KGGraphBuilder;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertEq;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertTrue;
@@ -30,17 +29,15 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertTrue
  * cleanup path that is only correct on the happy path, and impossible to notice from a test that
  * never throws.</p>
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class ErrorPathGameTest {
+public final class ErrorPathGameTest implements FabricGameTest {
 
-    private ErrorPathGameTest() {}
+    public ErrorPathGameTest() {}
 
     /**
      * A node that throws part-way through an exec flow leaves the executor usable: the run after it
      * computes the right answer, and the nodes downstream of the failure did not run.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void execFlowSurvivesAThrowingNode(GameTestHelper helper) {
         var b = KGGraphBuilder.blueprint();
         // SetVar's `value` port is UNKNOWN-typed and so carries no embedded constant: it has to be
@@ -75,8 +72,7 @@ public final class ErrorPathGameTest {
      * on the same pooled context — {@code EvalContext.dropStaged} is what guarantees this, and it
      * only runs on the failure path.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void aThrowingPullLeavesNoStaleStagedValue(GameTestHelper helper) {
         var b = KGGraphBuilder.blueprint();
         // A Multiply whose input is an Assert-guarded chain is awkward to build; a cycle is the
@@ -101,8 +97,7 @@ public final class ErrorPathGameTest {
     }
 
     /** {@code Break} with no enclosing loop is a diagnostic, not a silent no-op. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void breakOutsideALoopIsReported(GameTestHelper helper) {
         var b = KGGraphBuilder.blueprint();
         b.add("entry", EntryNode.class);
@@ -116,8 +111,7 @@ public final class ErrorPathGameTest {
     }
 
     /** A throw inside a loop body stops the loop and still leaves the executor usable. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void aThrowInsideALoopBodyUnwindsCleanly(GameTestHelper helper) {
         var b = KGGraphBuilder.blueprint();
         b.add("entry", EntryNode.class);
@@ -144,8 +138,7 @@ public final class ErrorPathGameTest {
     }
 
     /** An input with nothing wired and no constant resolves to the reader's default, not a crash. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void unwiredInputsFallBackToDefaults(GameTestHelper helper) {
         var b = KGGraphBuilder.blueprint();
         b.add("add", AddNode.class).constant("add.in1", 7f).constant("add.in2", 0f);

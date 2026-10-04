@@ -1,8 +1,7 @@
 package com.lowdragmc.kilagraph.test.gametest.blueprint;
 
 
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
-import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.gametest.framework.GameTest;
 import com.lowdragmc.kilagraph.Kilagraph;
 import com.lowdragmc.kilagraph.blueprint.nodes.exec.AssertNode;
@@ -23,19 +22,17 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
  * Engine-level tests for the exec runtime: queue draining, Entry → chain, Noop pass-through,
  * Print value capture via node state, Assert true/false behaviour.
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class ExecRuntimeGameTest {
+public final class ExecRuntimeGameTest implements FabricGameTest {
     private static final String ENTRY_FIRES_NEXT = "exec_entry_fires_next";
     private static final String UNWIRED_FLOW_NO_OP = "exec_unwired_flow_no_op";
     private static final String NOOP_PASSES_THROUGH = "exec_noop_passes_through";
     private static final String ASSERT_TRUE_CONTINUES = "exec_assert_true_continues";
     private static final String ASSERT_FALSE_THROWS = "exec_assert_false_throws";
 
-    private ExecRuntimeGameTest() {}
+    public ExecRuntimeGameTest() {}
 
     /** Entry → Print: PrintNode.state("last") captures the value, proving the queue drove it. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void entryFiresNext(GameTestHelper helper) {
         var g = newGraph();
         var entry = addNode(g, EntryNode.class);
@@ -57,8 +54,7 @@ public final class ExecRuntimeGameTest {
     }
 
     /** Entry with no wire on `next` is a no-op — must not throw. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void unwiredFlowNoOp(GameTestHelper helper) {
         var g = newGraph();
         var entry = addNode(g, EntryNode.class);
@@ -72,8 +68,7 @@ public final class ExecRuntimeGameTest {
     }
 
     /** Entry → Noop → Print. Noop must forward to Print. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void noopPassesThrough(GameTestHelper helper) {
         var g = newGraph();
         var entry = addNode(g, EntryNode.class);
@@ -97,8 +92,7 @@ public final class ExecRuntimeGameTest {
     }
 
     /** Entry → Assert(true) → Print. Should reach Print. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void assertTrueContinues(GameTestHelper helper) {
         var g = newGraph();
         var entry = addNode(g, EntryNode.class);
@@ -120,8 +114,7 @@ public final class ExecRuntimeGameTest {
     }
 
     /** Entry → Assert(false) → Print. Should throw AssertionError before Print runs. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void assertFalseThrows(GameTestHelper helper) {
         var g = newGraph();
         var entry = addNode(g, EntryNode.class);

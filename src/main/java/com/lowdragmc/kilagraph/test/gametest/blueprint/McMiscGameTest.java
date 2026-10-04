@@ -25,8 +25,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2f;
 
@@ -45,10 +44,9 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
  * other way round. They have nothing else in common, which is why they are here rather than spread across
  * five files nobody would find them in.
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class McMiscGameTest {
+public final class McMiscGameTest implements FabricGameTest {
 
-    private McMiscGameTest() {
+    public McMiscGameTest() {
     }
 
     /**
@@ -57,8 +55,7 @@ public final class McMiscGameTest {
      * <p>The read node is the check rather than {@code getDamageValue} directly, because the pair is what a
      * graph actually uses and a disagreement between them is the failure worth catching.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void damageIsWrittenAndClamped(GameTestHelper helper) {
         ItemStack pick = new ItemStack(Items.DIAMOND_PICKAXE);
         int maxDamage = pick.getMaxDamage();
@@ -96,8 +93,7 @@ public final class McMiscGameTest {
      * <p>Added out of alphabetical order on purpose: the node sorts, because the game keeps these in a hash
      * set and a graph reading {@code out[0]} would otherwise get a different tag on a different launch.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void entityTagsAreReadBackSorted(GameTestHelper helper) {
         Entity pig = helper.spawn(EntityType.PIG, new BlockPos(1, 2, 1));
         assertEq(helper, "a fresh pig has no tags", 0,
@@ -126,8 +122,7 @@ public final class McMiscGameTest {
      * random: the four lists must be the same length, and every trade must actually take and give something.
      * A node that mismatched the lists, or read the wrong side of a trade, breaks one of those.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void villagerTradesAreListed(GameTestHelper helper) {
         Entity trader = helper.spawn(EntityType.WANDERING_TRADER, new BlockPos(2, 2, 2));
 
@@ -162,8 +157,7 @@ public final class McMiscGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void chunkLoadingIsDistinguishedFromOutOfBounds(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos here = helper.absolutePos(new BlockPos(1, 2, 1));
@@ -202,8 +196,7 @@ public final class McMiscGameTest {
      * <p>Radius is kept at 1 chunk throughout. This is the most expensive node in the mod and a wide search
      * in a test would cost more than the test is worth.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void structureSearchIsConsistentAndFailsSoftly(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos from = helper.absolutePos(new BlockPos(1, 2, 1));

@@ -21,8 +21,7 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import org.joml.Vector3f;
 
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.addNode;
@@ -40,16 +39,14 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.setOption;
  * (1,2,3) to (4,6,8) has three different edge lengths, so a node that mixed up Y and Z could not agree
  * with the expectation by coincidence.
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class McGeometryGameTest {
+public final class McGeometryGameTest implements FabricGameTest {
 
     private static final float EPS = 1e-4f;
 
-    private McGeometryGameTest() {
+    public McGeometryGameTest() {
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void blockPosArithmetic(GameTestHelper helper) {
         var add = node(BlockPosNodes.Add.class, "a", new BlockPos(1, 2, 3), "b", new BlockPos(10, 20, 30));
         assertEq(helper, "add", new BlockPos(11, 22, 33), eval(add, "out", BlockPos.class));
@@ -69,8 +66,7 @@ public final class McGeometryGameTest {
      *
      * <p>A test that only checked one of them would pass against a node that ignored the option.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void blockPosVectorConversionsRespectTheCentreOption(GameTestHelper helper) {
         var centre = node(BlockPosNodes.ToVector.class, "in", new BlockPos(1, 2, 3));
         assertVec(helper, "centre", new float[] {1.5f, 2.5f, 3.5f}, eval(centre, "out", Object.class));
@@ -96,8 +92,7 @@ public final class McGeometryGameTest {
      * would look identical from the small case alone, and the whole point of the {@code truncated}
      * output is that a graph can tell.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void betweenEnumeratesAndReportsTruncation(GameTestHelper helper) {
         var small = node(BlockPosNodes.Between.class, "min", BlockPos.ZERO, "max", new BlockPos(1, 1, 1));
         List<?> positions = eval(small, "out", List.class);
@@ -115,8 +110,7 @@ public final class McGeometryGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void boundingBoxes(GameTestHelper helper) {
         var corners = node(AabbNodes.FromCorners.class, "a", new Vector3f(1, 2, 3),
                 "b", new Vector3f(4, 6, 8));
@@ -144,8 +138,7 @@ public final class McGeometryGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void boundingBoxRelations(GameTestHelper helper) {
         AABB unit = new AABB(0, 0, 0, 1, 1, 1);
         AABB overlapping = new AABB(0.5, 0.5, 0.5, 2, 2, 2);
@@ -173,8 +166,7 @@ public final class McGeometryGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void chunkCoordinates(GameTestHelper helper) {
         var create = node(ChunkPosNodes.Create.class, "x", 3, "z", -2);
         assertEq(helper, "create", new ChunkPos(3, -2), eval(create, "out", ChunkPos.class));
@@ -190,8 +182,7 @@ public final class McGeometryGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void directionMaths(GameTestHelper helper) {
         var rotate = node(DirectionNodes.Rotate.class, "in", Direction.NORTH,
                 "rotation", Rotation.CLOCKWISE_90);
@@ -266,8 +257,7 @@ public final class McGeometryGameTest {
      * total functions on a six-element enum — checking every case costs the same as checking one and
      * cannot miss the case someone forgot.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void directionOppositeAxisAndOffset(GameTestHelper helper) {
         for (Direction d : Direction.values()) {
             assertEq(helper, d + " opposite",

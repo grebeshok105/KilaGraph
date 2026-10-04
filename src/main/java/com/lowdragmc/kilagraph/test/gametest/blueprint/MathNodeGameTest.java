@@ -33,8 +33,7 @@ import java.util.Map;
 import java.util.OptionalLong;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.addNode;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertEq;
@@ -42,8 +41,7 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.newGraph;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.setInputConstant;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.setOption;
 
-@GameTestHolder(Kilagraph.MODID)
-public final class MathNodeGameTest {
+public final class MathNodeGameTest implements FabricGameTest {
     private static final String MULTIPLY = "math_multiply";
     private static final String DIVIDE = "math_divide";
     private static final String DIVIDE_BY_ZERO = "math_divide_by_zero";
@@ -69,7 +67,7 @@ public final class MathNodeGameTest {
     private static final String LOG_BASE = "math_log_base";
     private static final String ANGLE_CONVERT = "math_angle_convert";
 
-    private MathNodeGameTest() {}
+    public MathNodeGameTest() {}
 
     /** Run a simple float-out node with provided input constants; assert the output. */
     @SafeVarargs
@@ -87,9 +85,7 @@ public final class MathNodeGameTest {
         return new GraphExecutor(g).evaluate(n.getOutputsById().get("out"), Float.class);
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void multiply(GameTestHelper helper) {
         var g = newGraph();
@@ -103,9 +99,7 @@ public final class MathNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void divide(GameTestHelper helper) {
         assertEq(helper, "10/4",
@@ -115,9 +109,7 @@ public final class MathNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void divideByZero(GameTestHelper helper) {
         assertEq(helper, "x/0 = 0",
@@ -127,9 +119,7 @@ public final class MathNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void modulo(GameTestHelper helper) {
         assertEq(helper, "10%3", 1f,
@@ -139,9 +129,7 @@ public final class MathNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void negate(GameTestHelper helper) {
         assertEq(helper, "-5", -5f, runFloat(NegateNode.class, Map.entry("in", 5f)), 1e-5f);
@@ -149,9 +137,7 @@ public final class MathNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void abs(GameTestHelper helper) {
         assertEq(helper, "|-7|", 7f, runFloat(AbsNode.class, Map.entry("in", -7f)), 1e-5f);
@@ -159,9 +145,7 @@ public final class MathNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void min(GameTestHelper helper) {
         var g = newGraph();
@@ -173,9 +157,7 @@ public final class MathNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void max(GameTestHelper helper) {
         var g = newGraph();
@@ -187,9 +169,7 @@ public final class MathNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void clamp(GameTestHelper helper) {
         assertEq(helper, "clamp(5, 0, 10)", 5f,
@@ -204,9 +184,7 @@ public final class MathNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void pow(GameTestHelper helper) {
         assertEq(helper, "2^10", 1024f,
@@ -215,9 +193,7 @@ public final class MathNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void sqrt(GameTestHelper helper) {
         assertEq(helper, "sqrt(9)", 3f, runFloat(SqrtNode.class, Map.entry("in", 9f)), 1e-5f);
@@ -225,9 +201,7 @@ public final class MathNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void log(GameTestHelper helper) {
         // log_e(e) = 1
@@ -251,9 +225,7 @@ public final class MathNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void exp(GameTestHelper helper) {
         assertEq(helper, "e^0", 1f, runFloat(ExpNode.class, Map.entry("in", 0f)), 1e-5f);
@@ -262,9 +234,7 @@ public final class MathNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void trig(GameTestHelper helper) {
         var g = newGraph();
@@ -283,9 +253,7 @@ public final class MathNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void round(GameTestHelper helper) {
         for (var c : new Object[][]{{RoundNode.Op.ROUND, 3.6f, 4f}, {RoundNode.Op.ROUND, 3.4f, 3f},
@@ -301,9 +269,7 @@ public final class MathNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void sign(GameTestHelper helper) {
         assertEq(helper, "sign(5)", 1f, runFloat(SignNode.class, Map.entry("in", 5f)), 0f);
@@ -312,9 +278,7 @@ public final class MathNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void lerp(GameTestHelper helper) {
         assertEq(helper, "lerp(0,10,0.5)", 5f,
@@ -329,9 +293,7 @@ public final class MathNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void remap(GameTestHelper helper) {
         assertEq(helper, "0.5 of [0,1] → [0,100]", 50f,
@@ -342,9 +304,7 @@ public final class MathNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void randomDeterministic(GameTestHelper helper) {
         // Same seed → same value across two executors
@@ -364,9 +324,7 @@ public final class MathNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void fract(GameTestHelper helper) {
         assertEq(helper, "fract(3.25)", 0.25f, runFloat(FractNode.class, Map.entry("in", 3.25f)), 1e-5f);
@@ -374,9 +332,7 @@ public final class MathNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void atan2(GameTestHelper helper) {
         assertEq(helper, "atan2(1,1)", (float) (Math.PI / 4),
@@ -386,9 +342,7 @@ public final class MathNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void logBase(GameTestHelper helper) {
         assertEq(helper, "log_2(8)", 3f,
@@ -400,9 +354,7 @@ public final class MathNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void angleConvert(GameTestHelper helper) {
         var g = newGraph();
@@ -421,9 +373,7 @@ public final class MathNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void randomIntSeeded(GameTestHelper helper) {
         var g = newGraph();

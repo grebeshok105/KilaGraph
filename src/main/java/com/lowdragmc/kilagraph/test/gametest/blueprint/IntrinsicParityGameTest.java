@@ -39,8 +39,7 @@ import com.lowdragmc.lowdraglib2.nodegraphtookit.api.node.Node;
 import com.lowdragmc.lowdraglib2.nodegraphtookit.api.variable.VariableKind;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -70,10 +69,9 @@ import java.util.Set;
  * <p>{@link #everyIntrinsicIsCovered} fails if a class is added to the table without being added
  * here, so an opcode cannot ship untested.</p>
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class IntrinsicParityGameTest {
+public final class IntrinsicParityGameTest implements FabricGameTest {
 
-    private IntrinsicParityGameTest() {}
+    public IntrinsicParityGameTest() {}
 
     /**
      * Values chosen so a slip shows up: the signed zeroes separate {@code ==} from bit equality, the
@@ -165,8 +163,7 @@ public final class IntrinsicParityGameTest {
     }
 
     /** Inputs fed by wires — the producing-slot path. */
-    @GameTest(template = "empty", timeoutTicks = 2000)
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty", timeoutTicks = 2000)
     public static void intrinsicsMatchTheirNodesWhenWired(GameTestHelper helper) {
         for (Spec spec : specs()) {
             if (spec.logical()) continue;   // see Spec.logical
@@ -180,8 +177,7 @@ public final class IntrinsicParityGameTest {
     }
 
     /** Inputs as embedded constants — the {@code Constant} path. */
-    @GameTest(template = "empty", timeoutTicks = 2000)
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty", timeoutTicks = 2000)
     public static void intrinsicsMatchTheirNodesWhenConstant(GameTestHelper helper) {
         for (Spec spec : specs()) {
             if (spec.wiredOnly()) continue;   // see Spec.wiredOnly
@@ -203,8 +199,7 @@ public final class IntrinsicParityGameTest {
      * with nothing noticing. A {@code String} on the wire is the reachable way to get there:
      * {@code pullFloat} uses its default for anything that is not a {@link Number}.</p>
      */
-    @GameTest(template = "empty", timeoutTicks = 2000)
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty", timeoutTicks = 2000)
     public static void intrinsicsMatchTheirNodesOnDefaultedInputs(GameTestHelper helper) {
         for (Spec spec : specs()) {
             if (spec.wiredOnly()) continue;   // see Spec.wiredOnly
@@ -276,8 +271,7 @@ public final class IntrinsicParityGameTest {
      * <p>Nodes that do not promote are run too, and must be unaffected: their float answer is still
      * the whole of what they do, whatever they are fed.</p>
      */
-    @GameTest(template = "empty", timeoutTicks = 2000)
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty", timeoutTicks = 2000)
     public static void intrinsicsMatchTheirNodesOnWholeNumberWires(GameTestHelper helper) {
         for (Spec spec : specs()) {
             if (spec.logical()) continue;   // see Spec.logical — booleans have no numeric lane
@@ -346,8 +340,7 @@ public final class IntrinsicParityGameTest {
     }
 
     /** No opcode ships without a row above. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void everyIntrinsicIsCovered(GameTestHelper helper) {
         Set<Class<?>> covered = new HashSet<>();
         for (Spec s : specs()) covered.add(s.nodeClass());
@@ -370,8 +363,7 @@ public final class IntrinsicParityGameTest {
      * was missing was any guarantee that all five opcodes actually appear in something they compare:
      * {@code Gate} did not, until {@code execIntrinsicSampler} was written for it.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void everyExecIntrinsicIsCovered(GameTestHelper helper) {
         var sampler = KGGraphFixtures.execIntrinsicSampler();
         Set<String> present = new HashSet<>();

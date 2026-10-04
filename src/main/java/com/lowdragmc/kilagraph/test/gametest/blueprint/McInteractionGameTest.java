@@ -28,8 +28,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.BaseFireBlock;
 import net.minecraft.world.level.block.Blocks;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import org.joml.Vector2f;
 
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.addNode;
@@ -47,16 +46,14 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
  * is on fire, the fire block really is there — and every case also covers the refusal path, because these
  * actions are written to report failure rather than throw.
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class McInteractionGameTest {
+public final class McInteractionGameTest implements FabricGameTest {
 
-    private McInteractionGameTest() {
+    public McInteractionGameTest() {
     }
 
     // ---- entity ------------------------------------------------------------------------------
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void setsAndClearsFire(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         Entity pig = helper.spawn(EntityType.PIG, new BlockPos(1, 2, 1));
@@ -78,8 +75,7 @@ public final class McInteractionGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void namesAnEntity(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         Entity pig = helper.spawn(EntityType.PIG, new BlockPos(1, 2, 1));
@@ -98,8 +94,7 @@ public final class McInteractionGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void mountsAndDismounts(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         Entity pig = helper.spawn(EntityType.PIG, new BlockPos(1, 2, 1));
@@ -121,8 +116,7 @@ public final class McInteractionGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void setsEquipment(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         LivingEntity zombie = helper.spawn(EntityType.ZOMBIE, new BlockPos(1, 2, 1));
@@ -149,8 +143,7 @@ public final class McInteractionGameTest {
 
     // ---- world -------------------------------------------------------------------------------
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void ignitesAndExtinguishes(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos ground = helper.absolutePos(new BlockPos(1, 2, 1));
@@ -174,8 +167,7 @@ public final class McInteractionGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void boneMealsWhatCanGrow(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos grass = helper.absolutePos(new BlockPos(1, 2, 1));
@@ -193,8 +185,7 @@ public final class McInteractionGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void strikesLightning(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos at = helper.absolutePos(new BlockPos(1, 2, 1));
@@ -228,8 +219,7 @@ public final class McInteractionGameTest {
      * <p>If block destruction ever needs real coverage, it wants a dedicated world rather than a GameTest
      * structure area.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void explodes(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos centre = helper.absolutePos(new BlockPos(1, 2, 1));

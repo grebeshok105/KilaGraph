@@ -8,8 +8,7 @@ import com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers;
 import com.lowdragmc.kilagraph.test.gametest.KGGraphFixtures;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -37,10 +36,9 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertEq;
  * is not a redundant extra assertion next to the value check; it is the one with detection power, and
  * the value check is the one that happens to be quiet. Do not delete it as noise.</p>
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class SealedGraphConcurrencyGameTest {
+public final class SealedGraphConcurrencyGameTest implements FabricGameTest {
 
-    private SealedGraphConcurrencyGameTest() {}
+    public SealedGraphConcurrencyGameTest() {}
 
     private static final int THREADS = 8;
     private static final int ITERATIONS = 400;
@@ -50,8 +48,7 @@ public final class SealedGraphConcurrencyGameTest {
      * A graph the build pass fully discovers admits nothing when run — the precondition sealing is
      * built on, checked rather than assumed.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void aFullyWiredGraphAdmitsNothing(GameTestHelper helper) {
         var b = KGGraphFixtures.chainOfAdds(CHAIN);
         var exec = new GraphExecutor(b.graph());
@@ -73,8 +70,7 @@ public final class SealedGraphConcurrencyGameTest {
      * <p>The orphan node is the case that reaches {@code admit()} in the first place: it is in no
      * wire and in {@code getNodeModels()} for nobody, so the build pass cannot see it.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void sealingRefusesAdmissionAndRecordsIt(GameTestHelper helper) {
         var graph = KGGameTestHelpers.newGraph();
         var reached = KGGameTestHelpers.addRegisteredNode(graph, AbsNode.class);
@@ -119,8 +115,7 @@ public final class SealedGraphConcurrencyGameTest {
      * makes the instance shared at all, since {@code PreparedGraph.of} reads and fills its cache in
      * two steps and two first-time entries racing can each build their own.</p>
      */
-    @GameTest(template = "empty", timeoutTicks = 2000)
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty", timeoutTicks = 2000)
     public static void oneSealedGraphDrivesManyThreads(GameTestHelper helper) throws Exception {
         var b = KGGraphFixtures.chainOfAdds(CHAIN);
         var out = b.outputOf("n" + (CHAIN - 1));
@@ -210,8 +205,7 @@ public final class SealedGraphConcurrencyGameTest {
      * to one parent, so the test builder cannot express one callee shared by two root graphs; that path
      * is reasoned about in {@code PreparedGraph}, not demonstrated here.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void sealIsIdempotentAndUnsealIsPaired(GameTestHelper helper) {
         var b = KGGraphFixtures.chainOfAdds(CHAIN);
         var exec = new GraphExecutor(b.graph());

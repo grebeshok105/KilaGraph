@@ -23,8 +23,7 @@ import java.util.List;
 import java.util.Map;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import org.joml.Vector2f;
 
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.addNode;
@@ -44,16 +43,14 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
  * cover at all. Staleness never had any: the executor used to re-read the live model on every step,
  * so there was nothing to go stale.</p>
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class PreparedGraphGameTest {
+public final class PreparedGraphGameTest implements FabricGameTest {
 
-    private PreparedGraphGameTest() {}
+    public PreparedGraphGameTest() {}
 
     // ---- cycle detection -------------------------------------------------------------------
 
     /** Two nodes each feeding the other: pulling either one must raise {@link CycleException}. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void cycleIsDetected(GameTestHelper helper) {
         var g = newGraph();
         var a = addNode(g, LerpNode.class);
@@ -119,8 +116,7 @@ public final class PreparedGraphGameTest {
      * when the cycle throws is one that leads to the cycle, so the spurious exception and the real
      * one look the same.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void aLeakedVisitingStackWouldResurfaceOnAnUnrelatedBranch(GameTestHelper helper) {
         var g = newGraph();
 
@@ -161,8 +157,7 @@ public final class PreparedGraphGameTest {
     }
 
     /** A node wired to itself is the degenerate cycle and must be caught the same way. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void selfCycleIsDetected(GameTestHelper helper) {
         var g = newGraph();
         var a = addNode(g, LerpNode.class);
@@ -194,8 +189,7 @@ public final class PreparedGraphGameTest {
      * — that fallback is deliberate, and this pins it. The <em>rebuild</em> assertion is what
      * actually pins the detection: it fails if the digest stops noticing a port-set change.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void portSetGrowthIsNoticed(GameTestHelper helper) {
         var g = newGraph();
         var add = addNode(g, AddNode.class);
@@ -220,8 +214,7 @@ public final class PreparedGraphGameTest {
      * Rewiring an input after the executor has run must be picked up: the resolved form caches which
      * slot an input pulls from, and that is exactly what a new wire changes.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void rewiringIsNoticed(GameTestHelper helper) {
         var g = newGraph();
         var five = addNode(g, AddNode.class);
@@ -261,8 +254,7 @@ public final class PreparedGraphGameTest {
      * <p>{@code invalidateNode} is the reachable trigger: it is public and resolves the node it is
      * given without a freshness check first.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void admittingANodeDoesNotLaunderAnEdit(GameTestHelper helper) {
         var g = newGraph();
         var five = addNode(g, AddNode.class);
@@ -302,8 +294,7 @@ public final class PreparedGraphGameTest {
      * {@code Long.MAX_VALUE} first and then keeps the low 32 bits, giving {@code -1}. The numeric
      * lane has to reproduce the coercion the wrapper types performed, not merely "a number".</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void oversizedFloatNarrowsLikeNumberIntValue(GameTestHelper helper) {
         var g = newGraph();
         var pow = addNode(g, PowNode.class);
@@ -319,8 +310,7 @@ public final class PreparedGraphGameTest {
     }
 
     /** The same value read as a float must still be the float, not something narrowed. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void numericLaneRoundTripsThroughTheObjectLane(GameTestHelper helper) {
         var g = newGraph();
         var pow = addNode(g, PowNode.class);
@@ -350,8 +340,7 @@ public final class PreparedGraphGameTest {
      * to sit exactly on a halfway point — so it is a case that has to be reasoned about, not
      * searched for.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void largeLongRoundsOnceIntoFloat(GameTestHelper helper) {
         final long big = 9007199791611905L;
 
@@ -388,8 +377,7 @@ public final class PreparedGraphGameTest {
      * <p>The failure mode is the point: not a slow path, but {@code StackOverflowError} in place of
      * a catchable exception.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void cycleThroughAWirePortalIsStillDetected(GameTestHelper helper) {
         var g = newGraph();
         var decl = g.graphModel.createGraphPortalDeclaration("v", null, null);

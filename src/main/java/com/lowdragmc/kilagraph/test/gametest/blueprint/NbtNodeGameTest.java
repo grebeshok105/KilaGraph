@@ -1,8 +1,7 @@
 package com.lowdragmc.kilagraph.test.gametest.blueprint;
 
 
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
-import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.gametest.framework.GameTest;
 import com.lowdragmc.kilagraph.Kilagraph;
 import com.lowdragmc.kilagraph.blueprint.BlueprintGraph;
@@ -55,15 +54,14 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
  * {@link BlockEntity}. Compound ports are wire-only, so a value source always starts at NbtCreate
  * (or a seeded wire-only variable for the MC-object cases).
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class NbtNodeGameTest {
+public final class NbtNodeGameTest implements FabricGameTest {
     private static final String ROUND_TRIP_INT = "nbt_round_trip_int";
     private static final String ROUND_TRIP_STRING = "nbt_round_trip_string";
     private static final String HAS_AND_REMOVE = "nbt_has_and_remove";
     private static final String ITEM_STACK = "nbt_item_stack";
     private static final String BLOCK_ENTITY = "nbt_block_entity";
 
-    private NbtNodeGameTest() {}
+    public NbtNodeGameTest() {}
 
     /** A wire-only variable get-node output, seeded from the env at execution time. */
     private static PortModel source(BlueprintGraph g, String name, TypeHandle type) {
@@ -71,9 +69,7 @@ public final class NbtNodeGameTest {
         return g.graphModel.createVariableNode(v, new Vector2f(0, 0), null, null).getOutputPort();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void roundTripInt(GameTestHelper helper) {
         var g = newGraph();
@@ -94,9 +90,7 @@ public final class NbtNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void roundTripString(GameTestHelper helper) {
         var g = newGraph();
@@ -117,9 +111,7 @@ public final class NbtNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void hasAndRemove(GameTestHelper helper) {
         var g = newGraph();
@@ -154,9 +146,7 @@ public final class NbtNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void itemStack(GameTestHelper helper) {
         ItemStack stack = new ItemStack(Items.DIAMOND);
@@ -180,9 +170,7 @@ public final class NbtNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void blockEntity(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
@@ -211,8 +199,7 @@ public final class NbtNodeGameTest {
      * only pass if the game's own path parser is doing the work, so it pins the node to {@code /data get}
      * syntax rather than to a homemade dotted split that would happen to handle the easy cases.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void pathReadsNestedValues(GameTestHelper helper) {
         CompoundTag root = sample();
 
@@ -261,8 +248,7 @@ public final class NbtNodeGameTest {
     }
 
     /** {@code mc_nbt_path_set}, including the creation of missing parents and the aliasing it documents. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void pathWritesAndCreatesParents(GameTestHelper helper) {
         // Missing compounds are created on the way down, the way /data modify set does it.
         CompoundTag fresh = new CompoundTag();

@@ -19,8 +19,7 @@ import com.lowdragmc.lowdraglib2.nodegraphtookit.api.variable.VariableKind;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertEq;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertTrue;
@@ -38,14 +37,12 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertTrue
  * evaluates a node is directly observable in the resulting tag. Any change to evaluation count
  * shows up here as a wrong tag rather than as a performance difference.</p>
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class NbtPipelineGameTest {
+public final class NbtPipelineGameTest implements FabricGameTest {
 
-    private NbtPipelineGameTest() {}
+    public NbtPipelineGameTest() {}
 
     /** {@code {stats: {inner: {hp: 20}}}} built and read back three levels down. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void nestedCompoundRoundTrip(GameTestHelper helper) {
         var b = KGGraphBuilder.blueprint();
 
@@ -89,8 +86,7 @@ public final class NbtPipelineGameTest {
      * two tags and the second setter's key would go missing — which is why the evaluation count is
      * asserted here alongside the contents.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void chainedSetsShareOneTag(GameTestHelper helper) {
         var b = KGGraphBuilder.blueprint();
         b.add("tag", NbtCreateNode.class);
@@ -118,8 +114,7 @@ public final class NbtPipelineGameTest {
     }
 
     /** Compounds stored in a list, then read back out by index. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void nbtThroughAList(GameTestHelper helper) {
         var b = KGGraphBuilder.blueprint();
         b.add("empty", NbtCreateNode.class);
@@ -150,8 +145,7 @@ public final class NbtPipelineGameTest {
     }
 
     /** Remove drops exactly the key it names and leaves the rest. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void removeDropsOnlyTheNamedKey(GameTestHelper helper) {
         var b = KGGraphBuilder.blueprint();
         b.add("tag", NbtCreateNode.class);
@@ -173,8 +167,7 @@ public final class NbtPipelineGameTest {
      * A compound passed into a function, modified there, and read back out — the value crosses into
      * a child variable store and back through the call site's mirror pins.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void nbtAcrossASubgraphBoundary(GameTestHelper helper) {
         var outer = KGGraphBuilder.blueprint();
         var fn = outer.subgraph();

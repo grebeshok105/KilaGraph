@@ -14,8 +14,7 @@ import com.lowdragmc.kilagraph.graph.exec.GraphExecutor;
 import com.lowdragmc.lowdraglib2.nodegraphtookit.model.node.NodeModel;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.addNode;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.newGraph;
@@ -29,10 +28,9 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
  * flow came in through. Each input is its own Entry node here, run one at a time on the same
  * executor, so the node's state carries over between runs the way it does between two frames.
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class ExecStateNodesGameTest {
+public final class ExecStateNodesGameTest implements FabricGameTest {
 
-    private ExecStateNodesGameTest() {}
+    public ExecStateNodesGameTest() {}
 
     /** A Print that records {@code value} in its state as "last" — the one observable an exec chain has here. */
     private static NodeModel print(BlueprintGraph g, float value) {
@@ -61,8 +59,7 @@ public final class ExecStateNodesGameTest {
         return entry;
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void doOncePassesOnceUntilReset(GameTestHelper helper) {
         var g = newGraph();
         var once = addNode(g, DoOnceNode.class);
@@ -83,8 +80,7 @@ public final class ExecStateNodesGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void doOnceStartClosedNeedsAResetFirst(GameTestHelper helper) {
         var g = newGraph();
         var once = addNode(g, DoOnceNode.class);
@@ -103,8 +99,7 @@ public final class ExecStateNodesGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void doNPassesNTimesAndCountsThem(GameTestHelper helper) {
         var g = newGraph();
         var doN = addNode(g, DoNNode.class);
@@ -128,8 +123,7 @@ public final class ExecStateNodesGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void flipFlopAlternatesAndSaysWhich(GameTestHelper helper) {
         var g = newGraph();
         var flip = addNode(g, FlipFlopNode.class);
@@ -149,8 +143,7 @@ public final class ExecStateNodesGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void theToggleGateOpensClosesAndTogglesByWhichPinWasEntered(GameTestHelper helper) {
         var g = newGraph();
         var gate = addNode(g, ToggleGateNode.class);
@@ -179,8 +172,7 @@ public final class ExecStateNodesGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void multiGateFiresEachOutputOnceInOrderThenNothingUnlessItLoops(GameTestHelper helper) {
         var g = newGraph();
         var multi = addNode(g, MultiGateNode.class);
@@ -230,8 +222,7 @@ public final class ExecStateNodesGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void multiGateStartIndexPicksWhereARoundBegins(GameTestHelper helper) {
         var g = newGraph();
         var multi = addNode(g, MultiGateNode.class);

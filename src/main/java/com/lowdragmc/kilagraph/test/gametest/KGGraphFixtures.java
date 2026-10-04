@@ -41,7 +41,7 @@ import java.util.List;
  */
 public final class KGGraphFixtures {
 
-    private KGGraphFixtures() {}
+    public KGGraphFixtures() {}
 
     /**
      * Five statements over ~21 nodes with a Branch and two values fed back through the variable

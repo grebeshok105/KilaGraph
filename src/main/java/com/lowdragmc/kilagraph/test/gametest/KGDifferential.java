@@ -50,7 +50,7 @@ import java.util.function.Supplier;
  */
 public final class KGDifferential {
 
-    private KGDifferential() {}
+    public KGDifferential() {}
 
     /**
      * An executor configuration to compare.

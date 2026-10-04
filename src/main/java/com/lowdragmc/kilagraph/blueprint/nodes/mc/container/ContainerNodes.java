@@ -14,9 +14,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.wrapper.InvWrapper;
+import com.lowdragmc.kilagraph.util.KGCapabilityAdapters;
+import com.lowdragmc.lowdraglib2.utils.items.IItemHandler;
 
 /**
  * Finding an inventory, and reading what is in it.
@@ -77,7 +76,7 @@ public final class ContainerNodes {
             Direction from = ctx.getInput("side", Direction.class, Direction.NORTH);
             // Nulls for state and block entity let the capability resolve them itself, which is also the
             // path that works for a block that has no block entity at all.
-            IItemHandler handler = Capabilities.ItemHandler.BLOCK.getCapability(world, at, null, null, from);
+            IItemHandler handler = KGCapabilityAdapters.itemHandlerAt(world, at, from);
             ctx.setOutput("out", handler);
             ctx.setOutput("found", handler != null);
         }
@@ -112,7 +111,7 @@ public final class ContainerNodes {
         @Override
         public void evaluate(EvalContext ctx) {
             Entity e = ctx.getInput("entity", Entity.class, null);
-            IItemHandler handler = e == null ? null : e.getCapability(Capabilities.ItemHandler.ENTITY);
+            IItemHandler handler = KGCapabilityAdapters.entityItemHandler(e);
             ctx.setOutput("out", handler);
             ctx.setOutput("found", handler != null);
         }
@@ -141,7 +140,7 @@ public final class ContainerNodes {
             var p = ctx.getInput("player", Player.class, null);
             IItemHandler handler = p == null
                     ? null
-                    : new InvWrapper(p.getInventory());
+                    : KGCapabilityAdapters.containerHandler(p.getInventory());
             ctx.setOutput("out", handler);
             ctx.setOutput("found", handler != null);
         }

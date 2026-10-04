@@ -29,8 +29,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
@@ -54,16 +53,14 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
  * throw: an unknown sound id, an entity that is not living, a position outside the world. Those branches
  * are the ones a half-built graph will hit, so they are the ones most worth pinning.
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class McActionGameTest {
+public final class McActionGameTest implements FabricGameTest {
 
-    private McActionGameTest() {
+    public McActionGameTest() {
     }
 
     // ---- blocks ------------------------------------------------------------------------------
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void setAndBreakBlock(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos at = helper.absolutePos(new BlockPos(0, 2, 0));
@@ -90,8 +87,7 @@ public final class McActionGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void fillAndReplaceBlocks(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos min = helper.absolutePos(new BlockPos(0, 2, 0));
@@ -121,8 +117,7 @@ public final class McActionGameTest {
 
     // ---- entities ----------------------------------------------------------------------------
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void spawnMoveAndRemoveEntity(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos at = helper.absolutePos(new BlockPos(1, 2, 1));
@@ -155,8 +150,7 @@ public final class McActionGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void damageHealAndEffect(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         LivingEntity pig = helper.spawn(EntityType.PIG, new BlockPos(1, 2, 1));
@@ -193,8 +187,7 @@ public final class McActionGameTest {
 
     // ---- world effects -----------------------------------------------------------------------
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void soundAndParticles(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos at = helper.absolutePos(new BlockPos(1, 2, 1));
@@ -220,8 +213,7 @@ public final class McActionGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void dropItem(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos at = helper.absolutePos(new BlockPos(1, 2, 1));
@@ -286,8 +278,7 @@ public final class McActionGameTest {
      * <p>Every assertion is on the world or on captured text, never on {@code ok} alone: a node that
      * reported success without running anything would pass a test that trusted the flag.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void runsACommand(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos at = helper.absolutePos(new BlockPos(1, 2, 1));

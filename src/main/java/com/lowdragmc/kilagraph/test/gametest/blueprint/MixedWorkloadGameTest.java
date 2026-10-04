@@ -7,8 +7,7 @@ import com.lowdragmc.kilagraph.test.gametest.KGGraphFixtures;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertEq;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertTrue;
@@ -27,13 +26,11 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertTrue
  * going unnoticed, which is what makes this usable as the reference shape for the benchmark suite
  * and the differential harness.</p>
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class MixedWorkloadGameTest {
+public final class MixedWorkloadGameTest implements FabricGameTest {
 
-    private MixedWorkloadGameTest() {}
+    public MixedWorkloadGameTest() {}
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void computesEveryStage(GameTestHelper helper) {
         var b = KGGraphFixtures.mixedWorkload();
         var exec = new GraphExecutor(b.graph());
@@ -61,8 +58,7 @@ public final class MixedWorkloadGameTest {
      * order and count. This is the shape the differential harness compares an optimised executor
      * against, so its reproducibility has to hold first.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void isReproducible(GameTestHelper helper) {
         var b = KGGraphFixtures.mixedWorkload();
 
@@ -88,8 +84,7 @@ public final class MixedWorkloadGameTest {
      * dropped during a refactor — would keep passing the value assertions if the dropped stage
      * happened to be the last one, so the shape itself is asserted.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void isActuallyAMixedGraph(GameTestHelper helper) {
         var b = KGGraphFixtures.mixedWorkload();
         var exec = new GraphExecutor(b.graph());

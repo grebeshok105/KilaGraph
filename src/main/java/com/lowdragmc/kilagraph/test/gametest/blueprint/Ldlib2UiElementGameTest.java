@@ -18,8 +18,7 @@ import com.lowdragmc.lowdraglib2.nodegraphtookit.api.type.TypeHandles;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -37,15 +36,13 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertTrue
  * is supposed to come with it, or resolve a name against the wrong class. Both are pinned below by
  * observing a side effect, not by reading the field back.</p>
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class Ldlib2UiElementGameTest {
+public final class Ldlib2UiElementGameTest implements FabricGameTest {
 
-    private Ldlib2UiElementGameTest() {
+    public Ldlib2UiElementGameTest() {
     }
 
     /** The type option picks out of LDLib2's registry — the same table an xml tag resolves through. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void elementNewBuildsTheRegisteredType(GameTestHelper helper) {
         assertTrue(helper, "button", built("button") instanceof Button);
         assertTrue(helper, "label", built("label") instanceof Label);
@@ -58,8 +55,7 @@ public final class Ldlib2UiElementGameTest {
     }
 
     /** Children go in, come back in order, and a cycle is refused. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void childrenAreAddedInOrderAndCyclesAreRefused(GameTestHelper helper) {
         var g = KGGraphBuilder.blueprint()
                 .add("entry", EntryNode.class)
@@ -92,8 +88,7 @@ public final class Ldlib2UiElementGameTest {
     }
 
     /** Selectors find by id, by class and by type, from a tree built out of xml. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void selectorsFindByIdClassAndType(GameTestHelper helper) {
         var g = KGGraphBuilder.blueprint()
                 .add("entry", EntryNode.class)
@@ -131,8 +126,7 @@ public final class Ldlib2UiElementGameTest {
      * directly does not. A listener that never fires is exactly the failure a graph would experience
      * as "the toggle changed but nothing reacted".</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void setPropertyGoesThroughTheAnnotatedSetter(GameTestHelper helper) {
         var g = KGGraphBuilder.blueprint()
                 .add("entry", EntryNode.class)
@@ -164,8 +158,7 @@ public final class Ldlib2UiElementGameTest {
     }
 
     /** A property name that does not exist on the element fails cleanly instead of throwing. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void anUnknownPropertyReportsFailure(GameTestHelper helper) {
         var g = KGGraphBuilder.blueprint()
                 .add("entry", EntryNode.class)
@@ -190,8 +183,7 @@ public final class Ldlib2UiElementGameTest {
      * graph a second, competing way to set a background — the thing the LSS-only rule exists to
      * prevent.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void thePropertyRegistryExcludesStyleGroups(GameTestHelper helper) {
         var progress = UIPropertyRegistry.propertiesOfRegistered("progress-bar");
         assertTrue(helper, "value is offered", progress.containsKey("value"));
@@ -206,8 +198,7 @@ public final class Ldlib2UiElementGameTest {
     }
 
     /** Text reaches a Label, a Button's caption and a TextField alike. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void setTextCoversEveryCaption(GameTestHelper helper) {
         for (String type : List.of("label", "text", "button", "text-field")) {
             var g = KGGraphBuilder.blueprint()
@@ -232,8 +223,7 @@ public final class Ldlib2UiElementGameTest {
     }
 
     /** {@code get_value} / {@code set_value} go through the element's own value interface. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void valueNodesUseTheElementsOwnValue(GameTestHelper helper) {
         var g = KGGraphBuilder.blueprint()
                 .add("entry", EntryNode.class)
@@ -258,8 +248,7 @@ public final class Ldlib2UiElementGameTest {
     }
 
     /** An element with no value at all reports so rather than pretending. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void aPlainElementHasNoValue(GameTestHelper helper) {
         var g = KGGraphBuilder.blueprint()
                 .add("entry", EntryNode.class)
@@ -274,8 +263,7 @@ public final class Ldlib2UiElementGameTest {
     }
 
     /** {@code clear_children} keeps a Button's own caption unless told otherwise. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void clearChildrenKeepsInternalChildrenByDefault(GameTestHelper helper) {
         var g = KGGraphBuilder.blueprint()
                 .add("entry", EntryNode.class)

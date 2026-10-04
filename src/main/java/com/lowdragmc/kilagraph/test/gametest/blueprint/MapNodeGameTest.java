@@ -1,8 +1,7 @@
 package com.lowdragmc.kilagraph.test.gametest.blueprint;
 
 
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
-import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.gametest.framework.GameTest;
 import com.lowdragmc.kilagraph.Kilagraph;
 import com.lowdragmc.kilagraph.blueprint.BlueprintGraph;
@@ -35,8 +34,7 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.setInputCo
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.setOption;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
 
-@GameTestHolder(Kilagraph.MODID)
-public final class MapNodeGameTest {
+public final class MapNodeGameTest implements FabricGameTest {
     private static final String CREATE = "map_create";
     private static final String GET = "map_get";
     private static final String GET_DEFAULT = "map_get_default";
@@ -51,7 +49,7 @@ public final class MapNodeGameTest {
     private static final String MERGE = "map_merge";
     private static final String IMMUTABILITY = "map_immutability";
 
-    private MapNodeGameTest() {}
+    public MapNodeGameTest() {}
 
     /** Build a String→String map with the given alternating key/value pairs. */
     private static NodeModel stringStringMap(BlueprintGraph g, String... kvPairs) {
@@ -67,9 +65,7 @@ public final class MapNodeGameTest {
         return n;
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void create(GameTestHelper helper) {
         var g = newGraph();
@@ -83,9 +79,7 @@ public final class MapNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void get(GameTestHelper helper) {
         var g = newGraph();
@@ -101,9 +95,7 @@ public final class MapNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void getDefault(GameTestHelper helper) {
         var g = newGraph();
@@ -119,9 +111,7 @@ public final class MapNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void put(GameTestHelper helper) {
         var g = newGraph();
@@ -140,9 +130,7 @@ public final class MapNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void remove(GameTestHelper helper) {
         var g = newGraph();
@@ -159,9 +147,7 @@ public final class MapNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void containsKey(GameTestHelper helper) {
         var g = newGraph();
@@ -184,9 +170,7 @@ public final class MapNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void containsValue(GameTestHelper helper) {
         var g = newGraph();
@@ -213,9 +197,7 @@ public final class MapNodeGameTest {
         return get.getOutputsById().get("value");
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void keys(GameTestHelper helper) {
         var g = newGraph();
@@ -234,9 +216,7 @@ public final class MapNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void values(GameTestHelper helper) {
         var g = newGraph();
@@ -252,9 +232,7 @@ public final class MapNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void size(GameTestHelper helper) {
         var g = newGraph();
@@ -266,9 +244,7 @@ public final class MapNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void isEmpty(GameTestHelper helper) {
         var g = newGraph();
@@ -285,9 +261,7 @@ public final class MapNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void merge(GameTestHelper helper) {
         var g = newGraph();
@@ -306,9 +280,7 @@ public final class MapNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void immutability(GameTestHelper helper) {
         // Put must not mutate the source — re-evaluate source after put.

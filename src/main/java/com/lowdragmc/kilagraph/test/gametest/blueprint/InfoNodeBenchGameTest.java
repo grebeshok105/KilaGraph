@@ -11,8 +11,7 @@ import com.lowdragmc.lowdraglib2.nodegraphtookit.model.node.PortModel;
 import com.mojang.logging.LogUtils;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import org.slf4j.Logger;
 
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.addBlock;
@@ -38,12 +37,11 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertEq;
  *
  * <p>As everywhere in this suite, timing is logged and never asserted — the assertions are on the values.
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class InfoNodeBenchGameTest {
+public final class InfoNodeBenchGameTest implements FabricGameTest {
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private InfoNodeBenchGameTest() {
+    public InfoNodeBenchGameTest() {
     }
 
     /**
@@ -59,8 +57,7 @@ public final class InfoNodeBenchGameTest {
      * would have grown roughly fourfold from 16 to 64 nodes and did not. Kept because it was once cited as
      * a design justification before anyone measured it.</p>
      */
-    @GameTest(template = "empty", timeoutTicks = 6000)
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty", timeoutTicks = 6000)
     public static void wholeGraphCostOfHavingOne(GameTestHelper helper) {
         int chain = 64;
 

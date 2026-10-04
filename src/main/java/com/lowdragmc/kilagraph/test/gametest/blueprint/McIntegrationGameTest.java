@@ -57,8 +57,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import org.joml.Vector2f;
 
 import java.util.Map;
@@ -87,10 +86,9 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
  * iteration. If it were not, all five blocks would land on the same spot and every per-node test would
  * still pass. That is the class of bug integration coverage is for.
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class McIntegrationGameTest {
+public final class McIntegrationGameTest implements FabricGameTest {
 
-    private McIntegrationGameTest() {
+    public McIntegrationGameTest() {
     }
 
     /**
@@ -100,8 +98,7 @@ public final class McIntegrationGameTest {
      * {@code index + baseY} through Add and Block Pos Create. Five distinct blocks, five distinct
      * positions, one graph.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void buildsAColumn(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos base = helper.absolutePos(new BlockPos(0, 2, 0));
@@ -152,8 +149,7 @@ public final class McIntegrationGameTest {
      * hurt. This is the shape almost every real blueprint has, and it exercises the loop item flowing into
      * two separate nodes in the body.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void damagesOnlyTheMatchingEntities(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         LivingEntity pig = helper.spawn(EntityType.PIG, new BlockPos(1, 2, 1));
@@ -203,8 +199,7 @@ public final class McIntegrationGameTest {
      * loop, and it is the one where a cached block state would produce a visibly wrong result: the first
      * position's answer applied to all four.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void fillsOnlyTheAirInARegion(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos min = helper.absolutePos(new BlockPos(0, 2, 0));
@@ -264,8 +259,7 @@ public final class McIntegrationGameTest {
      * world and asked what it is holding. The component has to survive the copy the action makes and the
      * {@code ItemEntity}'s own handling of the stack, which no per-node test covers.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void itemComponentsSurviveIntoTheWorld(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos at = helper.absolutePos(new BlockPos(1, 2, 1));
@@ -333,8 +327,7 @@ public final class McIntegrationGameTest {
      * short of the whole chain working produces that agreement, and no per-node test can check it, because
      * each half is a different node.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void commandOutputIsParsedBackIntoANumber(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlueprintGraph g = newGraph();
@@ -387,8 +380,7 @@ public final class McIntegrationGameTest {
      * <p>So the round trip is now a graph: id → contents → element → stack → membership → true. A namespace
      * dropped on the way, or a list whose elements arrive as something other than items, breaks it.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void aTagsContentsAreMembersOfThatSameTag(GameTestHelper helper) {
         BlueprintGraph g = newGraph();
 
@@ -433,8 +425,7 @@ public final class McIntegrationGameTest {
      * <p>The closing assertion is a loop back to the start: whatever recipe the search found must, when
      * looked up by id, produce the item that was searched for.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void aFoundRecipeIdLooksUpItsOwnResult(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlueprintGraph g = newGraph();
@@ -482,8 +473,7 @@ public final class McIntegrationGameTest {
      * parent of the path that was written, so it can only answer if the intermediate compounds really were
      * created on the way down rather than faked on the leaf.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void nbtFlowsThroughAPathWriteAndBack(GameTestHelper helper) {
         BlueprintGraph g = newGraph();
 
@@ -527,8 +517,7 @@ public final class McIntegrationGameTest {
      * a fan-out the single-node tests had no way to express: the effect id is built once and wired both to
      * the node that adds it and to the {@code list_contains} that looks for it in the result.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void aPotionIsBuiltAndReadBackThroughTheGraph(GameTestHelper helper) {
         BlueprintGraph g = newGraph();
 
@@ -578,8 +567,7 @@ public final class McIntegrationGameTest {
      * <p>{@code mc_block_drops} also hands its {@code state} to {@code mc_can_harvest}, which is the join
      * that node's docs recommend and which nothing tested.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void oneBlockPositionDrivesTheWholeMiningDecision(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos at = helper.absolutePos(new BlockPos(1, 2, 1));
@@ -642,8 +630,7 @@ public final class McIntegrationGameTest {
      * once and cached it would still pass here, but one that mis-ordered the flow would not: the count
      * comes out wrong the moment the clear runs before either add.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void anEffectFlowRunsInOrderOverOneEntity(GameTestHelper helper) {
         // No level variable: none of the effect actions take a world port, they reach it through the entity.
         LivingEntity pig = helper.spawn(EntityType.PIG, new BlockPos(1, 2, 1));

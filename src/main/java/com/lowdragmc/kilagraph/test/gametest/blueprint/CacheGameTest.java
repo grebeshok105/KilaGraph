@@ -1,8 +1,7 @@
 package com.lowdragmc.kilagraph.test.gametest.blueprint;
 
 
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
-import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.gametest.framework.GameTest;
 import com.lowdragmc.kilagraph.Kilagraph;
 import com.lowdragmc.kilagraph.blueprint.nodes.exec.CacheClearNode;
@@ -20,22 +19,20 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.setOption;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
 
 /** Phase 3 — Cache memoisation and CacheClear invalidation (NODE_REF). */
-@GameTestHolder(Kilagraph.MODID)
-public final class CacheGameTest {
+public final class CacheGameTest implements FabricGameTest {
     private static final String CACHE_MEMOIZES = "exec_cache_memoizes";
     private static final String CACHE_CLEAR_RECOMPUTES = "exec_cache_clear_recomputes";
     private static final String CACHE_CLEAR_UNWIRED_NOOP = "exec_cache_clear_unwired_noop";
     private static final String CACHE_CLEAR_SELECTIVE = "exec_cache_clear_selective";
 
-    private CacheGameTest() {}
+    public CacheGameTest() {}
 
     /**
      * For(3) body: SetVar("seen", Cache.cached); Cache.value ← For.index. The Cache memoises the
      * first index (0) and keeps serving it across iterations despite the loop's clearCache().
      * A plain index→SetVar wire would leave seen==2; with Cache it stays 0.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void cacheMemoizes(GameTestHelper helper) {
         var g = newGraph();
         var entry = addNode(g, EntryNode.class);
@@ -66,8 +63,7 @@ public final class CacheGameTest {
      * Same graph as {@link #cacheMemoizes}, but after SetVar a CacheClear(ref ← Cache.ref) fires.
      * Each iteration recomputes the Cache, so seen tracks the current index → final seen==2.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void cacheClearRecomputes(GameTestHelper helper) {
         var g = newGraph();
         var entry = addNode(g, EntryNode.class);
@@ -104,8 +100,7 @@ public final class CacheGameTest {
      * Cache A. So seenA tracks the live index (recomputes → final 2) while seenB keeps its first
      * memo (0). Proves {@code invalidateNode} is targeted, not a global cache wipe.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void cacheClearSelective(GameTestHelper helper) {
         var g = newGraph();
         var entry = addNode(g, EntryNode.class);
@@ -147,8 +142,7 @@ public final class CacheGameTest {
     }
 
     /** CacheClear with an unwired ref must be a harmless no-op (and still flow). */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void cacheClearUnwiredNoop(GameTestHelper helper) {
         var g = newGraph();
         var entry = addNode(g, EntryNode.class);

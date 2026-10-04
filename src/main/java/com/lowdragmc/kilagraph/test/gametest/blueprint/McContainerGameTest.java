@@ -35,9 +35,8 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.material.Fluids;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import dev.architectury.fluid.FluidStack;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import org.joml.Vector2f;
 
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.addNode;
@@ -59,14 +58,12 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
  * the capability the nodes used. If both sides went through {@code IItemHandler}, a bug in how this mod
  * wraps the inventory would agree with itself and the test would pass.
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class McContainerGameTest {
+public final class McContainerGameTest implements FabricGameTest {
 
-    private McContainerGameTest() {
+    public McContainerGameTest() {
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void resolvesAChestAndReadsIt(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos chest = helper.absolutePos(new BlockPos(1, 2, 1));
@@ -104,8 +101,7 @@ public final class McContainerGameTest {
     }
 
     /** A block that is not a container resolves to nothing, and the readers degrade rather than throw. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void aStoneBlockIsNotAContainer(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos stone = helper.absolutePos(new BlockPos(1, 2, 1));
@@ -128,8 +124,7 @@ public final class McContainerGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void insertsExtractsAndSets(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos chest = helper.absolutePos(new BlockPos(1, 2, 1));
@@ -175,8 +170,7 @@ public final class McContainerGameTest {
     }
 
     /** A full chest takes what it can and hands back the rest instead of losing it. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void aFullChestReportsTheRemainder(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos chest = helper.absolutePos(new BlockPos(1, 2, 1));
@@ -196,8 +190,7 @@ public final class McContainerGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void aPlayerInventoryIsAContainer(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
@@ -235,8 +228,7 @@ public final class McContainerGameTest {
      * chest is asked what it holds — through vanilla, not through the tag. This is the test that fails if
      * {@code setChanged} or the block update is skipped, which is the whole risk in that node.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void blockEntityNbtRoundTrips(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos from = helper.absolutePos(new BlockPos(1, 2, 1));
@@ -300,8 +292,7 @@ public final class McContainerGameTest {
      * bucket. So a graph pointed at a partly-filled cauldron gets nothing and a correct {@code ok = false},
      * which looks like a broken node until you know this. Recorded here because it cost a debugging round.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void readsAndDrainsACauldron(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos cauldron = helper.absolutePos(new BlockPos(1, 2, 1));
@@ -349,7 +340,7 @@ public final class McContainerGameTest {
 
         // --- and filling it puts the water back ---
         var fill = runFluid(level, cauldron, FluidContainerNodes.Fill.class,
-                "fluid", new FluidStack(
+                "fluid", FluidStack.create(
                         Fluids.WATER, 1000));
         assertTrue(helper, "the fill reported success", fill.ok());
         assertTrue(helper, "and moved something", fill.get("filled", Integer.class) > 0);
@@ -359,8 +350,7 @@ public final class McContainerGameTest {
     }
 
     /** A block with no tank degrades to zero tanks and refusals, rather than crashing. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void fluidTanksDegradeOnBlocksThatHaveNone(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos stone = helper.absolutePos(new BlockPos(1, 2, 1));
@@ -386,7 +376,7 @@ public final class McContainerGameTest {
                 exec.evaluate(get.getOutputsById().get("capacity"), Integer.class).intValue());
 
         var fill = runFluid(level, stone, FluidContainerNodes.Fill.class,
-                "fluid", new FluidStack(
+                "fluid", FluidStack.create(
                         Fluids.WATER, 1000));
         assertFalse(helper, "filling a non-tank is refused", fill.ok());
         assertEq(helper, "with nothing moved", 0, fill.get("filled", Integer.class).intValue());
@@ -406,8 +396,7 @@ public final class McContainerGameTest {
      * an unrelated field. Here the tag is taken from a pig at one place and written to a pig at another,
      * and the second pig must stay put.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void entityNbtRoundTripsWithoutTeleporting(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         var donor = helper.spawn(EntityType.PIG, new BlockPos(1, 2, 1));

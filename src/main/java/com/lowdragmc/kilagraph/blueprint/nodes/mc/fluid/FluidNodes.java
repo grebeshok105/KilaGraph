@@ -13,7 +13,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import net.neoforged.neoforge.fluids.FluidStack;
+import dev.architectury.fluid.FluidStack;
 
 /**
  * Fluids and fluid stacks.
@@ -51,7 +51,7 @@ public final class FluidNodes {
             return Component.translatable("kg.node.mc_fluid_stack_unpack.tooltip");
         }
 
-        @InputPort public FluidStack stack = FluidStack.EMPTY;
+        @InputPort public FluidStack stack = FluidStack.empty();
         @OutputPort public Fluid fluid;
         @OutputPort public int amount;
         @OutputPort public boolean empty;
@@ -63,7 +63,7 @@ public final class FluidNodes {
             ctx.setOutput("fluid", s.getFluid());
             ctx.setOutput("amount", s.getAmount());
             ctx.setOutput("empty", s.isEmpty());
-            ctx.setOutput("name", (Object) s.getHoverName());
+            ctx.setOutput("name", (Object) s.getName());
         }
     }
 
@@ -111,8 +111,8 @@ public final class FluidNodes {
             // An empty fluid or a zero amount both mean "nothing", and FluidStack's own constructor
             // would happily build an inconsistent stack out of one but not the other.
             ctx.setOutput("out", f == null || f == Fluids.EMPTY || amount == 0
-                    ? FluidStack.EMPTY
-                    : new FluidStack(f, amount));
+                    ? FluidStack.empty()
+                    : FluidStack.create(f, amount));
         }
     }
 
@@ -123,7 +123,7 @@ public final class FluidNodes {
             return Component.translatable("kg.node.mc_fluid_stack_with_amount.tooltip");
         }
 
-        @InputPort public FluidStack stack = FluidStack.EMPTY;
+        @InputPort public FluidStack stack = FluidStack.empty();
         @InputPort public int amount = 1000;
         @OutputPort public FluidStack out;
 
@@ -132,7 +132,7 @@ public final class FluidNodes {
             FluidStack s = stack(ctx, "stack");
             int amount = Math.max(0, ctx.getInt("amount", 1000));
             if (s.isEmpty() || amount == 0) {
-                ctx.setOutput("out", FluidStack.EMPTY);
+                ctx.setOutput("out", FluidStack.empty());
                 return;
             }
             // copy first: a FluidStack is mutable and the input may already have been handed to
@@ -151,13 +151,13 @@ public final class FluidNodes {
             return Component.translatable("kg.node.mc_fluid_stack_same_fluid.tooltip");
         }
 
-        @InputPort public FluidStack a = FluidStack.EMPTY;
-        @InputPort public FluidStack b = FluidStack.EMPTY;
+        @InputPort public FluidStack a = FluidStack.empty();
+        @InputPort public FluidStack b = FluidStack.empty();
         @OutputPort public boolean out;
 
         @Override
         public void evaluate(EvalContext ctx) {
-            ctx.setOutput("out", FluidStack.isSameFluid(stack(ctx, "a"), stack(ctx, "b")));
+            ctx.setOutput("out", stack(ctx, "a").isFluidEqual(stack(ctx, "b")));
         }
     }
 
@@ -213,7 +213,7 @@ public final class FluidNodes {
     }
 
     private static FluidStack stack(EvalContext ctx, String id) {
-        FluidStack s = ctx.getInput(id, FluidStack.class, FluidStack.EMPTY);
-        return s == null ? FluidStack.EMPTY : s;
+        FluidStack s = ctx.getInput(id, FluidStack.class, FluidStack.empty());
+        return s == null ? FluidStack.empty() : s;
     }
 }

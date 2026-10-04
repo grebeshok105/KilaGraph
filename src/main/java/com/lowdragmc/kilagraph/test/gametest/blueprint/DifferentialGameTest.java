@@ -8,8 +8,7 @@ import com.lowdragmc.kilagraph.graph.exec.GraphExecutor;
 import com.lowdragmc.kilagraph.test.gametest.KGGraphFixtures;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 import java.util.List;
 
@@ -33,10 +32,9 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertTrue
  * {@code IntrinsicParityGameTest.everyExecIntrinsicIsCovered} exists because {@code Gate} had a
  * switch and appeared in no graph here.</p>
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class DifferentialGameTest {
+public final class DifferentialGameTest implements FabricGameTest {
 
-    private DifferentialGameTest() {}
+    public DifferentialGameTest() {}
 
     /** The graphs every mode is compared on. Shared with the behaviour tests and the benchmarks. */
     private static List<Scenario> scenarios() {
@@ -65,8 +63,7 @@ public final class DifferentialGameTest {
     }
 
     /** Every scenario agrees between a stock executor and a frozen one. */
-    @GameTest(template = "empty", timeoutTicks = 600)
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty", timeoutTicks = 600)
     public static void everyScenarioAgreesAcrossModes(GameTestHelper helper) {
         for (Scenario s : scenarios()) {
             String diff = KGDifferential.compareModes(s, Mode.DEFAULT, Mode.FROZEN);
@@ -82,8 +79,7 @@ public final class DifferentialGameTest {
      * Every optimisation, together, is indistinguishable from the paths it replaced. This is the
      * assertion each optimisation stage is admitted by.
      */
-    @GameTest(template = "empty", timeoutTicks = 600)
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty", timeoutTicks = 600)
     public static void optimisationsAgreeWithTheUnoptimisedPaths(GameTestHelper helper) {
         for (Scenario s : scenarios()) {
             String diff = KGDifferential.compareModes(s, Mode.UNOPTIMISED, Mode.DEFAULT);
@@ -100,8 +96,7 @@ public final class DifferentialGameTest {
      * pass just as happily if every scenario produced an empty value list and an empty trace — which
      * is precisely how a guard rail quietly stops guarding.
      */
-    @GameTest(template = "empty", timeoutTicks = 600)
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty", timeoutTicks = 600)
     public static void theHarnessActuallyObservesSomething(GameTestHelper helper) {
         for (Scenario s : scenarios()) {
             var result = KGDifferential.run(s.builder().get(), s, Mode.DEFAULT);
@@ -119,8 +114,7 @@ public final class DifferentialGameTest {
      * The harness can tell two runs apart. A comparator that returned "no difference" unconditionally
      * would make every mode agree forever, so it is checked against a pair that really does differ.
      */
-    @GameTest(template = "empty", timeoutTicks = 600)
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty", timeoutTicks = 600)
     public static void theHarnessDetectsARealDifference(GameTestHelper helper) {
         // Both sides share one graph, so the difference is genuinely in what the executor did rather
         // than in which node objects it did it to.

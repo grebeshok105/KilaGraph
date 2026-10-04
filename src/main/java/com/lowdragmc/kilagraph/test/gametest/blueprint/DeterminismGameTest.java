@@ -11,8 +11,7 @@ import com.lowdragmc.kilagraph.test.gametest.KGGraphBuilder;
 import com.lowdragmc.kilagraph.test.gametest.KGGraphFixtures;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 import java.util.OptionalLong;
 
@@ -31,14 +30,12 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertTrue
  * a tolerance would hide exactly the kind of drift an executor change introduces, such as a value
  * that starts making an extra round trip through {@code double}.</p>
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class DeterminismGameTest {
+public final class DeterminismGameTest implements FabricGameTest {
 
-    private DeterminismGameTest() {}
+    public DeterminismGameTest() {}
 
     /** The same seed produces the same random draws, in the same order. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void aSeededRunIsReproducible(GameTestHelper helper) {
         float[] a = drawFour(1234L);
         float[] b = drawFour(1234L);
@@ -53,8 +50,7 @@ public final class DeterminismGameTest {
      * A different seed produces different draws — without this, {@link #aSeededRunIsReproducible}
      * would pass just as happily against an RNG that always returned the same number.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void adifferentSeedProducesDifferentDraws(GameTestHelper helper) {
         float[] a = drawFour(1234L);
         float[] b = drawFour(9876L);
@@ -67,8 +63,7 @@ public final class DeterminismGameTest {
     }
 
     /** Repeating a run on one executor gives bit-identical values and an identical trace. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void repeatedRunsAgreeExactly(GameTestHelper helper) {
         var b = KGGraphFixtures.locomotion();
         var store = seededStore();
@@ -100,8 +95,7 @@ public final class DeterminismGameTest {
      * They share a {@link com.lowdragmc.kilagraph.graph.exec.PreparedGraph}; the per-run value
      * tables must stay their own.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void interleavedExecutorsDoNotInterfere(GameTestHelper helper) {
         var b = KGGraphFixtures.locomotion();
 

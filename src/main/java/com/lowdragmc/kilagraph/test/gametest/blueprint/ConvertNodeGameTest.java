@@ -26,8 +26,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.addNode;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertEq;
@@ -38,8 +37,7 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.setOption;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.valueSource;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
 
-@GameTestHolder(Kilagraph.MODID)
-public final class ConvertNodeGameTest {
+public final class ConvertNodeGameTest implements FabricGameTest {
     private static final String TO_STRING = "convert_to_string";
     private static final String PARSE_NUMBER = "convert_parse_number";
     private static final String PARSE_BOOL = "convert_parse_bool";
@@ -47,7 +45,7 @@ public final class ConvertNodeGameTest {
     private static final String TO_INT = "convert_to_int";
     private static final String TO_FLOAT = "convert_to_float";
 
-    private ConvertNodeGameTest() {}
+    public ConvertNodeGameTest() {}
 
     /** A wired Float source (AddNode out) to feed UNKNOWN inputs that have no embedded constant. */
     private static PortModel floatSource(
@@ -86,9 +84,7 @@ public final class ConvertNodeGameTest {
         return get.getOutputsById().get("value");
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void toStringTest(GameTestHelper helper) {
         // Number to string via wire from a String source (since UNKNOWN port has no constant)
@@ -106,9 +102,7 @@ public final class ConvertNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void parseNumber(GameTestHelper helper) {
         var g = newGraph();
@@ -126,9 +120,7 @@ public final class ConvertNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void parseBool(GameTestHelper helper) {
         for (String s : new String[]{"true", "True", "YES", "1"}) {
@@ -148,9 +140,7 @@ public final class ConvertNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void toInt(GameTestHelper helper) {
         for (var c : new Object[][]{{ToIntNode.Op.TRUNC, 3.9f, 3}, {ToIntNode.Op.TRUNC, -3.9f, -3},
@@ -166,9 +156,7 @@ public final class ConvertNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void toFloat(GameTestHelper helper) {
         var g = newGraph();
@@ -179,9 +167,7 @@ public final class ConvertNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void numberFormat(GameTestHelper helper) {
         var g = newGraph();
@@ -218,8 +204,7 @@ public final class ConvertNodeGameTest {
      * constant — there is no editor for a value whose type is not yet decided. So the test feeds it from
      * a real producer, which is also the only way a graph can use it.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void castRelabelsAndCoerces(GameTestHelper helper) {
         // An int, produced by unpacking a block position.
         assertEq(helper, "int stays an int", 7, castInt(TypeHandles.INT, Integer.class).intValue());
@@ -277,8 +262,7 @@ public final class ConvertNodeGameTest {
     // ParseNumber("<a pasted id>") answered the nearest float. See NumericLane.
 
     /** A whole number above a float's 24-bit mantissa converts to itself, not to a neighbour. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void toIntKeepsLargeWholeNumbers(GameTestHelper helper) {
         // 20000001 is not representable as a float; the nearest is 20000002.
         int value = 20_000_001;
@@ -291,8 +275,7 @@ public final class ConvertNodeGameTest {
     }
 
     /** Out of an int's range, ToInt stops at the limit rather than wrapping round to a wrong sign. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void toIntSaturatesRatherThanWrapping(GameTestHelper helper) {
         var g = newGraph();
         var n = addNode(g, ToIntNode.class);
@@ -309,8 +292,7 @@ public final class ConvertNodeGameTest {
     }
 
     /** To Long: no ceiling, and the rounding option still applies to a fractional input. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void toLong(GameTestHelper helper) {
         long big = 3_090_200_953_712_304_400L;
         var g = newGraph();
@@ -332,8 +314,7 @@ public final class ConvertNodeGameTest {
     }
 
     /** To Double widens without the seven-digit ceiling a float would impose. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void toDouble(GameTestHelper helper) {
         long value = 9_007_199_254_740_991L;   // 2^53 - 1: exact in a double, nowhere near it in a float
         var g = newGraph();
@@ -345,8 +326,7 @@ public final class ConvertNodeGameTest {
     }
 
     /** Text of digits parses whole, keeping every digit; text with a point parses fractional. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void parseNumberKeepsWholeTextWhole(GameTestHelper helper) {
         var g = newGraph();
         var n = addNode(g, ParseNumberNode.class);

@@ -31,9 +31,8 @@ import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import dev.architectury.fluid.FluidStack;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.addNode;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertEq;
@@ -47,16 +46,14 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
 /**
  * Block states, item stacks, fluids, text and the registry probes — everything that needs no world.
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class McStructureGameTest {
+public final class McStructureGameTest implements FabricGameTest {
 
-    private McStructureGameTest() {
+    public McStructureGameTest() {
     }
 
     // ---- block states ------------------------------------------------------------------------
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void blockStateBasics(GameTestHelper helper) {
         var def = node(BlockStateNodes.DefaultState.class, "block", Blocks.OAK_STAIRS);
         BlockState state = eval(def, "out", BlockState.class);
@@ -89,8 +86,7 @@ public final class McStructureGameTest {
      * have actually changed the state, and both an unknown property name and an illegal value are
      * asserted to report {@code ok = false} while leaving the state intact.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void blockStatePropertiesReadAndWrite(GameTestHelper helper) {
         BlockState stairs = Blocks.OAK_STAIRS.defaultBlockState();
 
@@ -125,8 +121,7 @@ public final class McStructureGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void blockStateRotateAndMirror(GameTestHelper helper) {
         // A north-facing stair rotated 90 clockwise faces east.
         BlockState stairs = Blocks.OAK_STAIRS.defaultBlockState();
@@ -162,8 +157,7 @@ public final class McStructureGameTest {
 
     // ---- item stacks -------------------------------------------------------------------------
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void itemStackCountAndEquality(GameTestHelper helper) {
         var counted = node(ItemStackNodes.WithCount.class, "stack", new ItemStack(Items.DIAMOND, 1),
                 "count", 5);
@@ -195,8 +189,7 @@ public final class McStructureGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void itemStackComponents(GameTestHelper helper) {
         ItemStack plain = new ItemStack(Items.DIAMOND);
 
@@ -239,8 +232,7 @@ public final class McStructureGameTest {
 
     // ---- fluids ------------------------------------------------------------------------------
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void fluidStacks(GameTestHelper helper) {
         var create = node(FluidNodes.Create.class, "fluid", Fluids.WATER, "amount", 500);
         FluidStack stack = eval(create, "out", FluidStack.class);
@@ -253,14 +245,14 @@ public final class McStructureGameTest {
         var none = node(FluidNodes.Create.class, "fluid", Fluids.EMPTY, "amount", 500);
         assertTrue(helper, "empty fluid is empty", eval(none, "out", FluidStack.class).isEmpty());
 
-        var resized = node(FluidNodes.WithAmount.class, "stack", new FluidStack(Fluids.LAVA, 100),
+        var resized = node(FluidNodes.WithAmount.class, "stack", FluidStack.create(Fluids.LAVA, 100),
                 "amount", 250);
         assertEq(helper, "with amount", 250, eval(resized, "out", FluidStack.class).getAmount());
         assertEq(helper, "with amount keeps the fluid", Fluids.LAVA,
                 eval(resized, "out", FluidStack.class).getFluid());
 
-        var same = node(FluidNodes.SameFluid.class, "a", new FluidStack(Fluids.WATER, 1),
-                "b", new FluidStack(Fluids.WATER, 1000));
+        var same = node(FluidNodes.SameFluid.class, "a", FluidStack.create(Fluids.WATER, 1),
+                "b", FluidStack.create(Fluids.WATER, 1000));
         assertTrue(helper, "amount does not affect fluid identity", eval(same, "out", Boolean.class));
 
         var toBlock = node(FluidNodes.ToBlock.class, "in", Fluids.WATER);
@@ -274,8 +266,7 @@ public final class McStructureGameTest {
 
     // ---- text --------------------------------------------------------------------------------
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void textNodes(GameTestHelper helper) {
         var literal = node(TextNodes.Literal.class, "text", "hello");
         assertEq(helper, "literal", "hello", eval(literal, "out", Component.class).getString());
@@ -319,8 +310,7 @@ public final class McStructureGameTest {
      * a structural component to a compound that passes straight through. A round trip that only ever
      * saw compounds would not notice the wrapper being wrong.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void dataComponentsRoundTrip(GameTestHelper helper) {
         ItemStack sword = new ItemStack(Items.DIAMOND_SWORD);
         ResourceLocation damage = id("minecraft:damage");
@@ -377,8 +367,7 @@ public final class McStructureGameTest {
      * UNKNOWN port no embedded constant on purpose — an untyped port takes its value purely from
      * upstream. That is the same reason {@code Cast} has no constant on its input.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void instanceOfAnswersWithoutThrowing(GameTestHelper helper) {
         assertTrue(helper, "an identifier is an Identifier",
                 probeIsType(KGTypeHandles.RESOURCE_LOCATION));
@@ -417,8 +406,7 @@ public final class McStructureGameTest {
 
     // ---- registry probes ---------------------------------------------------------------------
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void registryProbes(GameTestHelper helper) {
         var effect = node(RegistryProbeNodes.EffectExists.class, "id", id("minecraft:speed"));
         assertTrue(helper, "speed is an effect", eval(effect, "out", Boolean.class));

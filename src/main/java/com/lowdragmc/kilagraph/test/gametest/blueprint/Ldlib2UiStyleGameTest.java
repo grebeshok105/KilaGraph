@@ -15,8 +15,7 @@ import com.lowdragmc.lowdraglib2.gui.ui.style.StyleOrigin;
 import com.lowdragmc.lowdraglib2.nodegraphtookit.api.variable.VariableKind;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertEq;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertFalse;
@@ -35,10 +34,9 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertTrue
  * <p>{@code ldlib2_ui_apply_stylesheet} is what lets the stylesheet half be covered at all: it is the
  * match-and-apply step the engine would have done, performed explicitly.</p>
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class Ldlib2UiStyleGameTest {
+public final class Ldlib2UiStyleGameTest implements FabricGameTest {
 
-    private Ldlib2UiStyleGameTest() {
+    public Ldlib2UiStyleGameTest() {
     }
 
     /**
@@ -47,8 +45,7 @@ public final class Ldlib2UiStyleGameTest {
      * <p>This is the whole reason the origin is an option rather than a constant. A graph that sets a
      * hover colour inline must beat the sheet; a graph that forces a colour must beat both.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void higherOriginsWin(GameTestHelper helper) {
         var g = KGGraphBuilder.blueprint()
                 .add("entry", EntryNode.class)
@@ -85,8 +82,7 @@ public final class Ldlib2UiStyleGameTest {
     }
 
     /** Removing the graph's own value at one layer lets the layer beneath show through again. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void removingOneLayerRevealsTheOneBelow(GameTestHelper helper) {
         var g = KGGraphBuilder.blueprint()
                 .add("entry", EntryNode.class)
@@ -125,8 +121,7 @@ public final class Ldlib2UiStyleGameTest {
      * style bag directly, which is data rather than rendering — so on this thread the two genuinely
      * differ, and asserting they agree would be asserting something false.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void anLssBlockMatchesTheDeclarationParser(GameTestHelper helper) {
         String declarations = "color: #ff3355aa; opacity: 0.5;";
         var g = KGGraphBuilder.blueprint()
@@ -155,8 +150,7 @@ public final class Ldlib2UiStyleGameTest {
     }
 
     /** An unknown property in a block is skipped, and the rest of the block still applies. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void anUnknownDeclarationDoesNotFailTheBlock(GameTestHelper helper) {
         var g = KGGraphBuilder.blueprint()
                 .add("entry", EntryNode.class)
@@ -184,8 +178,7 @@ public final class Ldlib2UiStyleGameTest {
      * LSS colour parser does not accept a bare signed integer. Typing into the pin gives a String,
      * which is passed through untouched.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void anIntegerWiredIntoAColourIsFormattedAsHex(GameTestHelper helper) {
         var g = KGGraphBuilder.blueprint()
                 .add("entry", EntryNode.class)
@@ -207,8 +200,7 @@ public final class Ldlib2UiStyleGameTest {
     }
 
     /** Class names go on, come off, and toggle. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void classOperationsBehave(GameTestHelper helper) {
         var g = KGGraphBuilder.blueprint()
                 .add("entry", EntryNode.class)
@@ -248,8 +240,7 @@ public final class Ldlib2UiStyleGameTest {
      * <p>Covers the pipeline the style engine owns on the client, in the one place it can be checked
      * without a screen.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void applyStylesheetMatchesSelectors(GameTestHelper helper) {
         var g = KGGraphBuilder.blueprint()
                 .add("entry", EntryNode.class)
@@ -279,8 +270,7 @@ public final class Ldlib2UiStyleGameTest {
     }
 
     /** A local stylesheet is recorded on the element even where no engine will resolve it. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void aLocalStylesheetIsAttachedAndDetached(GameTestHelper helper) {
         var g = KGGraphBuilder.blueprint()
                 .add("entry", EntryNode.class)

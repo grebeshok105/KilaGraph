@@ -15,7 +15,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.fluids.FluidStack;
+import dev.architectury.fluid.FluidStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,13 +89,13 @@ public final class DataComponentNodes {
         }
 
         @InputPort
-        public FluidStack stack = FluidStack.EMPTY;
+        public FluidStack stack = FluidStack.empty();
         @OutputPort
         public List<?> out;
 
         @Override
         public void evaluate(EvalContext ctx) {
-            FluidStack s = ctx.getInput("stack", FluidStack.class, FluidStack.EMPTY);
+            FluidStack s = ctx.getInput("stack", FluidStack.class, FluidStack.empty());
             List<ResourceLocation> ids = new ArrayList<>();
             if (s != null && !s.isEmpty()) {
                 for (DataComponentType<?> type : s.getComponents().keySet()) {

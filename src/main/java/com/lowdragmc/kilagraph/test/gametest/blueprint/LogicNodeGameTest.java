@@ -1,8 +1,7 @@
 package com.lowdragmc.kilagraph.test.gametest.blueprint;
 
 
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
-import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.gametest.framework.GameTest;
 import com.lowdragmc.kilagraph.Kilagraph;
 import com.lowdragmc.kilagraph.blueprint.nodes.logic.EqualsNode;
@@ -19,17 +18,14 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.setOption;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.valueSource;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
 
-@GameTestHolder(Kilagraph.MODID)
-public final class LogicNodeGameTest {
+public final class LogicNodeGameTest implements FabricGameTest {
     private static final String NOT = "logic_not_basic";
     private static final String XOR_2 = "logic_xor_pair";
     private static final String XOR_3 = "logic_xor_odd_parity";
 
-    private LogicNodeGameTest() {}
+    public LogicNodeGameTest() {}
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void notBasic(GameTestHelper helper) {
         var g = newGraph();
@@ -46,9 +42,7 @@ public final class LogicNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void xorPair(GameTestHelper helper) {
         // 4 cases: FF=F, FT=T, TF=T, TT=F
@@ -65,9 +59,7 @@ public final class LogicNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void xorOddParity(GameTestHelper helper) {
         // 3 inputs: T T T → T (odd count)
@@ -100,8 +92,7 @@ public final class LogicNodeGameTest {
      * graph sees two fives. Which wrapper a wire carries is a detail of whichever node produced it,
      * and the editor never shows it.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void equalsComparesNumbersByValue(GameTestHelper helper) {
         record Case(String label, Class<?> ta, Object a, Class<?> tb, Object b, boolean equal) {}
         var cases = new Case[]{
@@ -123,8 +114,7 @@ public final class LogicNodeGameTest {
     }
 
     /** Equality across more than two inputs, and non-numbers still going through equals. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void equalsAcrossThreeInputsAndNonNumbers(GameTestHelper helper) {
         var g = newGraph();
         var n = addNode(g, EqualsNode.class);

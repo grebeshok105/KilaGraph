@@ -8,8 +8,7 @@ import com.lowdragmc.kilagraph.graph.type.Vectors;
 import com.lowdragmc.lowdraglib2.nodegraphtookit.model.node.NodeModel;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -31,16 +30,14 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
  * else. Every operation that claims to be width-polymorphic is therefore checked at 2 and 4 as
  * well, and the results are values no other width could produce by accident.
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class VectorNodeGameTest {
+public final class VectorNodeGameTest implements FabricGameTest {
 
     private static final float EPS = 1e-4f;
 
-    private VectorNodeGameTest() {
+    public VectorNodeGameTest() {
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void makeAndBreakRoundTripEveryWidth(GameTestHelper helper) {
         BlueprintGraph g = newGraph();
         NodeModel make = addNode(g, VectorNodes.Make.class);
@@ -78,8 +75,7 @@ public final class VectorNodeGameTest {
      * {@code Vector3f} answers correctly for x/y/z and drops w, and only a four-component
      * expectation can see that.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void componentWiseOperationsKeepEveryComponent(GameTestHelper helper) {
         BlueprintGraph g = newGraph();
         NodeModel add = addNode(g, VectorNodes.Add.class);
@@ -123,8 +119,7 @@ public final class VectorNodeGameTest {
      * {@code |(1,2,2,4)|} is 3 over the first three components and 5 over all four, so a cast to
      * {@code Vector3f} cannot pass by coincidence.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void reducingOperationsSumOverEveryComponent(GameTestHelper helper) {
         BlueprintGraph g = newGraph();
         NodeModel length = addNode(g, VectorNodes.Length.class);
@@ -159,8 +154,7 @@ public final class VectorNodeGameTest {
     }
 
     /** Normalising the zero vector must produce zero, not the NaN that division would. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void normalizeOfZeroIsZeroNotNaN(GameTestHelper helper) {
         BlueprintGraph g = newGraph();
         NodeModel norm = addNode(g, VectorNodes.Normalize.class);
@@ -191,8 +185,7 @@ public final class VectorNodeGameTest {
     }
 
     /** Cross is right-handed and genuinely three-dimensional. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void crossFollowsTheRightHandRule(GameTestHelper helper) {
         BlueprintGraph g = newGraph();
         NodeModel cross = addNode(g, VectorNodes.Cross.class);
@@ -213,8 +206,7 @@ public final class VectorNodeGameTest {
     }
 
     /** Flatten drops the axis it is told to and leaves the others exactly alone. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void flattenDropsTheChosenAxisOnly(GameTestHelper helper) {
         BlueprintGraph g = newGraph();
         NodeModel flatten = addNode(g, VectorNodes.Flatten.class);
@@ -232,8 +224,7 @@ public final class VectorNodeGameTest {
     }
 
     /** The signed turn from one heading to another, folded into [-180, 180). */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void yawBetweenIsSignedAndFolded(GameTestHelper helper) {
         // Minecraft's convention: +Z is zero and +X is -90, so turning from +Z to +X is -90.
         // The opposite sign would be self-consistent and wrong in exactly the way that makes a
@@ -259,8 +250,7 @@ public final class VectorNodeGameTest {
      * mismatch, passes all of them. The mixed case is also the one a real graph hits by accident,
      * since {@code KGGraphModel} lets any vector width reach any vector pin.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void mismatchedWidthsTakeTheWiderAndZeroFill(GameTestHelper helper) {
         BlueprintGraph g = newGraph();
         NodeModel add = addNode(g, VectorNodes.Add.class);
@@ -306,8 +296,7 @@ public final class VectorNodeGameTest {
      * <p>Without the clamp a t of 2 doubles the distance past b and a t of -1 runs backwards past a.
      * Both are plausible-looking numbers, which is why nothing downstream would flag them.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void lerpClampsTToTheUnitRange(GameTestHelper helper) {
         assertLerp(helper, "t below 0 gives a", -1f, new float[] {10f, 20f, 30f});
         assertLerp(helper, "t of 0 gives a", 0f, new float[] {10f, 20f, 30f});
@@ -325,8 +314,7 @@ public final class VectorNodeGameTest {
      * input must therefore behave exactly as the width-3 case does, ignoring w rather than folding
      * it in or refusing the input.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void crossReadsTheFirstThreeOfAnyWidth(GameTestHelper helper) {
         BlueprintGraph g = newGraph();
         NodeModel cross = addNode(g, VectorNodes.Cross.class);
@@ -341,8 +329,7 @@ public final class VectorNodeGameTest {
     }
 
     /** An axis the input does not have leaves the vector alone rather than failing. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void flattenIgnoresAnAxisTheInputDoesNotHave(GameTestHelper helper) {
         BlueprintGraph g = newGraph();
         NodeModel flatten = addNode(g, VectorNodes.Flatten.class);
@@ -368,8 +355,7 @@ public final class VectorNodeGameTest {
      * implementation that folded y in somewhere. A mob looking up a slope has a non-zero y in its
      * facing, and its turn must not change because of it.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void yawIgnoresTheVerticalComponent(GameTestHelper helper) {
         // same headings as the "forward to +X" case, now steeply pitched: still -90
         assertYaw(helper, "pitched inputs give the same turn",
@@ -381,8 +367,7 @@ public final class VectorNodeGameTest {
     }
 
     /** Make fills unconnected components with zero, and Make2 really produces two of them. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void makeDefaultsToZeroAndMake2StaysWidthTwo(GameTestHelper helper) {
         BlueprintGraph g = newGraph();
         NodeModel make = addNode(g, VectorNodes.Make.class);

@@ -25,8 +25,7 @@ import com.lowdragmc.lowdraglib2.nodegraphtookit.model.node.NodeModel;
 import com.lowdragmc.lowdraglib2.nodegraphtookit.model.node.PortModel;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.addNode;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertEq;
@@ -57,10 +56,9 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
  * and the NBT readers do in a player's graph, and the way a float-typed embedded constant deliberately
  * does not.</p>
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class NumericPromotionGameTest {
+public final class NumericPromotionGameTest implements FabricGameTest {
 
-    private NumericPromotionGameTest() {}
+    public NumericPromotionGameTest() {}
 
     /** A tick count well past 2^24, where a float can no longer hold consecutive integers apart. */
     private static final long BIG = 3_090_200_953_712_304_400L;
@@ -124,8 +122,7 @@ public final class NumericPromotionGameTest {
      * the "different from the last one" check below is the actual regression test, and the exact-value
      * assertions are what say it is right rather than merely varying.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void moduloOnATickCounterIsExact(GameTestHelper helper) {
         long previous = Long.MIN_VALUE;
         for (long i = 0; i < 5; i++) {
@@ -147,8 +144,7 @@ public final class NumericPromotionGameTest {
     }
 
     /** Sign and the zero divisor keep the behaviour the float lane had. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void moduloEdgesInTheWholeLane(GameTestHelper helper) {
         var g1 = newGraph();
         assertEq(helper, "-7 % 3 takes the sign of a", -1L,
@@ -161,8 +157,7 @@ public final class NumericPromotionGameTest {
     }
 
     /** Add, Subtract, Multiply, Min, Max, Clamp, Abs, Sign and Negate all reach the whole lane. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void wholeNumbersSurviveEveryPromotedOperation(GameTestHelper helper) {
         var gAdd = newGraph();
         var add = addNode(gAdd, AddNode.class);
@@ -232,8 +227,7 @@ public final class NumericPromotionGameTest {
      * {@code a < b} was false and {@code a >= b} was true — the graph could not see the tick
      * advance.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void comparisonsSeeConsecutiveTicksApart(GameTestHelper helper) {
         record Case(Class<? extends Node> node, String label, long a, long b, boolean expected) {}
         // Both orders of the pair, because each operator is only <em>distinguishing</em> in one of
@@ -268,8 +262,7 @@ public final class NumericPromotionGameTest {
      * 5.0 used to be would still pass a numeric comparison and would still be wrong — {@code ToString}
      * downstream would start printing "5" instead of "5.0".</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void constantOnlyGraphsStayFloat(GameTestHelper helper) {
         var gMod = newGraph();
         var mod = addNode(gMod, ModuloNode.class);
@@ -305,8 +298,7 @@ public final class NumericPromotionGameTest {
      * {@code float}, so typing 40 stores {@code 40.0f}; if that counted as "someone asked for float"
      * then {@code gameTime % 40} — the exact case being fixed — would still be broken.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void aWholeFloatConstantDoesNotForceTheFloatLane(GameTestHelper helper) {
         var g = newGraph();
         var n = longAndConstant(g, SubtractNode.class, PAST_MANTISSA, "b", 1f);
@@ -323,8 +315,7 @@ public final class NumericPromotionGameTest {
      * ...but a constant that carries a fraction <em>does</em> force a float lane, because a fraction
      * is not expressible in the whole one. Asking for {@code x - 0.5} has to mean it.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void aFractionalConstantForcesTheFloatLane(GameTestHelper helper) {
         var g = newGraph();
         var n = longAndConstant(g, SubtractNode.class, 10L, "b", 0.5f);
@@ -338,8 +329,7 @@ public final class NumericPromotionGameTest {
     }
 
     /** A genuinely double producer wins over a long one — the widest lane asked for is the lane. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void doubleBeatsWhole(GameTestHelper helper) {
         var g = newGraph();
         var n = addNode(g, AddNode.class);
@@ -355,8 +345,7 @@ public final class NumericPromotionGameTest {
     }
 
     /** The lane folds across every input of a variadic node, not just the first two. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void theLaneFoldsOverEveryVariadicInput(GameTestHelper helper) {
         var g = newGraph();
         var n = addNode(g, AddNode.class);
@@ -377,8 +366,7 @@ public final class NumericPromotionGameTest {
      * which is a worse trap than the one being fixed. {@code Sqrt} and {@code Lerp} have no whole
      * answer to give in the first place.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void realValuedOperationsStayFloat(GameTestHelper helper) {
         var gDiv = newGraph();
         Object div = outBothWays(helper, "7 / 2", gDiv,
@@ -404,8 +392,7 @@ public final class NumericPromotionGameTest {
      * the next, so {@code (gameTime % 40) + 1} is exact all the way through rather than only at the
      * first hop.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void theLaneSurvivesAChainOfNodes(GameTestHelper helper) {
         var g = newGraph();
         var mod = longAndConstant(g, ModuloNode.class, BIG, "b", 40f);

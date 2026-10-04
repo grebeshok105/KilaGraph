@@ -12,8 +12,7 @@ import com.lowdragmc.lowdraglib2.nodegraphtookit.api.node.Node;
 import com.lowdragmc.lowdraglib2.nodegraphtookit.model.node.NodeModel;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -41,14 +40,13 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.setOption;
  * <p>That the pins <em>say</em> so is {@link VectorPinTypeGameTest}'s business; this file is about
  * what the arithmetic does.
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class VectorNodeExtrasGameTest {
+public final class VectorNodeExtrasGameTest implements FabricGameTest {
 
     private static final float EPS = 1e-4f;
     /** Rotation goes through {@code Mth}'s sine table, which is good to about 5e-5 per component. */
     private static final float TRIG_EPS = 1e-3f;
 
-    private VectorNodeExtrasGameTest() {
+    public VectorNodeExtrasGameTest() {
     }
 
     // ---- structure
@@ -59,8 +57,7 @@ public final class VectorNodeExtrasGameTest {
      * <p>The widening cases are the ones Break-into-Make cannot reach, and the reason this node
      * exists at all: that pair always answers a Vector3 whatever went in.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void swizzleMaskDecidesTheOutputWidth(GameTestHelper helper) {
         // narrow: a Vec4 down to its first two components
         Object xy = swizzled(new Vector4f(1f, 2f, 3f, 4f), "xy");
@@ -93,8 +90,7 @@ public final class VectorNodeExtrasGameTest {
      * <p>The one-character case is not tidiness: at width one {@code carrier} answers a bare float,
      * which no vector pin downstream would accept, so the node would have a dead output pin.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void swizzleRefusesMasksItCannotHonour(GameTestHelper helper) {
         float[] input = {1f, 2f, 3f};
         assertVec(helper, "single character", input, swizzled(new Vector3f(1f, 2f, 3f), "x"));
@@ -113,8 +109,7 @@ public final class VectorNodeExtrasGameTest {
     }
 
     /** Concat lays vectors end to end and stops at four components. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void concatJoinsInOrderAndStopsAtFour(GameTestHelper helper) {
         BlueprintGraph g = newGraph();
         NodeModel concat = addNode(g, VectorStructNodes.Concat.class);
@@ -144,8 +139,7 @@ public final class VectorNodeExtrasGameTest {
     }
 
     /** Append widens by exactly one, and has nowhere to go at width four. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void appendWidensByOneAndStopsAtFour(GameTestHelper helper) {
         Object three = appended(new Vector2f(1f, 2f), 9f);
         assertTrue(helper, "Vec2 plus a number is a Vec3, got " + three, three instanceof Vector3f);
@@ -163,8 +157,7 @@ public final class VectorNodeExtrasGameTest {
     }
 
     /** Set Component replaces one axis, keeps the width, and ignores an axis the value lacks. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void setComponentKeepsTheInputWidth(GameTestHelper helper) {
         assertVec(helper, "default axis is Y", new float[] {1f, 9f, 3f},
                 withComponent(new Vector3f(1f, 2f, 3f), 1, 9f));
@@ -184,8 +177,7 @@ public final class VectorNodeExtrasGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void widthConversionsAnswerTheTypeTheirPinNames(GameTestHelper helper) {
         Object two = unary(VectorConvertNodes.ToVec2.class, new Vector4f(1f, 2f, 3f, 4f));
         assertTrue(helper, "To Vector 2 answers a Vector2f, got " + two, two instanceof Vector2f);
@@ -214,8 +206,7 @@ public final class VectorNodeExtrasGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void directionToAnswersAUnitVectorAndTheDistance(GameTestHelper helper) {
         BlueprintGraph g = newGraph();
         NodeModel n = addNode(g, VectorGeometryNodes.DirectionTo.class);
@@ -243,8 +234,7 @@ public final class VectorNodeExtrasGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void setLengthKeepsTheDirection(GameTestHelper helper) {
         assertVec(helper, "a 3-4-5 vector at length 10", new float[] {6f, 8f, 0f},
                 withLength(new Vector3f(3f, 4f, 0f), 10f));
@@ -260,8 +250,7 @@ public final class VectorNodeExtrasGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void slerpSweepsTheArcRatherThanCuttingAcross(GameTestHelper helper) {
         Vector3f x = new Vector3f(1f, 0f, 0f);
         Vector3f y = new Vector3f(0f, 1f, 0f);
@@ -294,8 +283,7 @@ public final class VectorNodeExtrasGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void perpendicularIsOrthogonalAndUnit(GameTestHelper helper) {
         Object[] inputs = {
                 new Vector3f(1f, 0f, 0f), new Vector3f(0f, 1f, 0f), new Vector3f(0f, 0f, 1f),
@@ -317,8 +305,7 @@ public final class VectorNodeExtrasGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void vectorWrapFoldsEveryComponent(GameTestHelper helper) {
         assertVec(helper, "a mix of inside, over and under",
                 new float[] {0.25f, 0.75f, 0.5f},
@@ -334,8 +321,7 @@ public final class VectorNodeExtrasGameTest {
     }
 
     /** Get Component reads by index, and answers zero outside the vector rather than throwing. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void getComponentReadsByIndexAndZeroesOutOfRange(GameTestHelper helper) {
         for (int i = 0; i < 4; i++) {
             assertEq(helper, "component " + i, (float) (i + 1),
@@ -357,8 +343,7 @@ public final class VectorNodeExtrasGameTest {
      * <p>The factors differ per axis on purpose: a Multiply implemented as Scale — one number for
      * every component — is the plausible wrong version, and equal factors would not see it.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void multiplyAndDivideActPerComponent(GameTestHelper helper) {
         Object product = binary(VectorMathNodes.Multiply.class,
                 new Vector4f(1f, 2f, 3f, 4f), new Vector4f(10f, 20f, 30f, 40f));
@@ -379,8 +364,7 @@ public final class VectorNodeExtrasGameTest {
     }
 
     /** Negate, Abs, Min and Max, each per component and each keeping the width. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void negateAbsMinAndMaxActPerComponent(GameTestHelper helper) {
         assertVec(helper, "negate", new float[] {-1f, 2f, -3f, 0f},
                 unary(VectorMathNodes.Negate.class, new Vector4f(1f, -2f, 3f, 0f)));
@@ -399,8 +383,7 @@ public final class VectorNodeExtrasGameTest {
     }
 
     /** Clamp holds every component between the scalar bounds, inverted range included. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void clampHoldsEveryComponentBetweenTheBounds(GameTestHelper helper) {
         BlueprintGraph g = newGraph();
         NodeModel clamp = addNode(g, VectorMathNodes.Clamp.class);
@@ -426,8 +409,7 @@ public final class VectorNodeExtrasGameTest {
      * <p>-2.7 and 2.5 are chosen so that no two modes agree: Floor gives -3 where Trunc gives -2,
      * and Round's half-up rule shows on the 2.5.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void everyRoundingModeDiffers(GameTestHelper helper) {
         Vector4f in = new Vector4f(-2.7f, 2.5f, -0.5f, 0f);
         assertVec(helper, "round", new float[] {-3f, 3f, 0f, 0f},
@@ -448,8 +430,7 @@ public final class VectorNodeExtrasGameTest {
     // ---- geometry
 
     /** The squared forms count every component, and really are the square. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void squaredFormsCountEveryComponent(GameTestHelper helper) {
         // |(1,2,2,4)| is 5 over four components and 3 over three, so 25 cannot come from a cast
         BlueprintGraph g = newGraph();
@@ -467,8 +448,7 @@ public final class VectorNodeExtrasGameTest {
     }
 
     /** Clamp Length rescales without steering, and a zero vector has no direction to stretch. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void clampLengthRescalesWithoutTurning(GameTestHelper helper) {
         // |(3,0,4)| is 5; capped at 1 the direction must survive as (0.6, 0, 0.8). Clamping the
         // components instead would give (1, 0, 1), which points somewhere else entirely.
@@ -495,8 +475,7 @@ public final class VectorNodeExtrasGameTest {
      * <p>Checking the sum is what catches a sign error in either: both halves can look plausible on
      * their own and still not reconstruct the input.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void projectAndRejectSplitTheVector(GameTestHelper helper) {
         Vector3f a = new Vector3f(3f, 4f, 0f);
         // b is deliberately not a unit vector: its length must divide out
@@ -522,8 +501,7 @@ public final class VectorNodeExtrasGameTest {
     }
 
     /** Reflect mirrors about the plane, keeps the length, and tolerates an unnormalised normal. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void reflectMirrorsAboutTheNormal(GameTestHelper helper) {
         BlueprintGraph g = newGraph();
         NodeModel reflect = addNode(g, VectorGeometryNodes.Reflect.class);
@@ -554,8 +532,7 @@ public final class VectorNodeExtrasGameTest {
      * <p>The parallel case is the one that matters: rounding can push the cosine a hair past 1, and
      * {@code acos} of 1.0000001 is NaN — which only shows up for the tidy inputs a first test uses.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void angleBetweenIsUnsignedAndSafeAtTheEnds(GameTestHelper helper) {
         assertAngle(helper, "perpendicular", new Vector3f(1f, 0f, 0f), new Vector3f(0f, 1f, 0f), 90f);
         assertAngle(helper, "opposite", new Vector3f(1f, 0f, 0f), new Vector3f(-1f, 0f, 0f), 180f);
@@ -571,8 +548,7 @@ public final class VectorNodeExtrasGameTest {
     }
 
     /** Rotate About Axis is right-handed, periodic, and passes a zero axis through. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void rotateAboutAxisIsRightHanded(GameTestHelper helper) {
         // +X turned about +Y by 90 degrees goes to -Z. The opposite sign is self-consistent and
         // wrong, exactly as it is for Cross Product, which this is built from.
@@ -601,8 +577,7 @@ public final class VectorNodeExtrasGameTest {
      * <p>The named cases pin the convention — yaw 0 down +Z, yaw −90 down +X, positive pitch
      * <em>down</em> — and the round trip catches an inverse that is self-consistently wrong.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void rotationAndDirectionAgreeWithTheGame(GameTestHelper helper) {
         assertVec(helper, "yaw 0 looks along +Z", new float[] {0f, 0f, 1f}, direction(0f, 0f), TRIG_EPS);
         assertVec(helper, "yaw -90 looks along +X", new float[] {1f, 0f, 0f}, direction(-90f, 0f), TRIG_EPS);
@@ -634,8 +609,7 @@ public final class VectorNodeExtrasGameTest {
     }
 
     /** Move Towards steps at most maxDelta and lands exactly on the target once it is in range. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void moveTowardsLandsExactlyOnTheTarget(GameTestHelper helper) {
         Vector3f from = new Vector3f(1f, 0f, 0f);
         Vector3f to = new Vector3f(11f, 0f, 0f);
@@ -655,8 +629,7 @@ public final class VectorNodeExtrasGameTest {
     }
 
     /** Nearly Equals compares over the wider width, and honours the tolerance. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void nearlyEqualsComparesOverTheWiderWidth(GameTestHelper helper) {
         assertTrue(helper, "identical vectors are equal",
                 nearlyEqual(new Vector3f(1f, 2f, 3f), new Vector3f(1f, 2f, 3f), EPS));

@@ -1,8 +1,7 @@
 package com.lowdragmc.kilagraph.test.gametest.blueprint;
 
 
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
-import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.gametest.framework.GameTest;
 import com.lowdragmc.kilagraph.Kilagraph;
 import com.lowdragmc.kilagraph.blueprint.nodes.math.AddNode;
@@ -20,18 +19,15 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.setInputCo
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.setOption;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
 
-@GameTestHolder(Kilagraph.MODID)
-public final class OptionalNodeGameTest {
+public final class OptionalNodeGameTest implements FabricGameTest {
     private static final String IS_NULL = "optional_is_null";
     private static final String NOT_NULL = "optional_not_null";
     private static final String DEFAULT_KEEPS = "optional_default_keeps_non_null";
     private static final String DEFAULT_FALLBACK = "optional_default_uses_fallback";
 
-    private OptionalNodeGameTest() {}
+    public OptionalNodeGameTest() {}
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void isNull(GameTestHelper helper) {
         // null case: unconnected UNKNOWN port has no constant → null
@@ -51,9 +47,7 @@ public final class OptionalNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void notNull(GameTestHelper helper) {
         var g1 = newGraph();
@@ -71,9 +65,7 @@ public final class OptionalNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void defaultKeeps(GameTestHelper helper) {
         // type=Float — DefaultNode's ports become Float-typed which HAVE constants.
@@ -88,9 +80,7 @@ public final class OptionalNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void defaultFallback(GameTestHelper helper) {
         // type=UNKNOWN: no embedded constants → "in" is null → fallback to defaultValue (wired).

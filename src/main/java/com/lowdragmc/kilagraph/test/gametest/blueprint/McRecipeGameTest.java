@@ -36,8 +36,7 @@ import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import org.joml.Vector2f;
 
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.addNode;
@@ -60,13 +59,12 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
  * <p>Where an answer is random — the loot rolls — the assertion is on a table whose outcome is forced, so
  * that the test pins the wiring instead of the dice.
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class McRecipeGameTest {
+public final class McRecipeGameTest implements FabricGameTest {
 
     private static final ResourceLocation CRAFTING_TABLE = ResourceLocation.parse("minecraft:crafting_table");
     private static final ResourceLocation NOT_A_THING = ResourceLocation.parse("kilagraph:nope");
 
-    private McRecipeGameTest() {
+    public McRecipeGameTest() {
     }
 
     // ---- crafting ------------------------------------------------------------------------------
@@ -77,8 +75,7 @@ public final class McRecipeGameTest {
      * <p>The 1x4 case is the load-bearing half: the same four planks in a line are not a crafting table, so
      * a node that ignored the grid shape would pass the first assertion and fail this one.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void craftingResultRespectsTheGrid(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         List<ItemStack> fourPlanks = List.of(
@@ -126,8 +123,7 @@ public final class McRecipeGameTest {
      * assert the other side of the same coin: {@code mc_recipe_by_id} on that very recipe reports it exists
      * and produces nothing, because by then there is no grid left to assemble from.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void craftingResultAssemblesComputedRecipes(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
 
@@ -151,8 +147,7 @@ public final class McRecipeGameTest {
     // ---- cooking -------------------------------------------------------------------------------
 
     /** Each of the four cooking blocks, including one that has no recipe for the item. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void smeltingReportsResultTimeAndExperience(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         ItemStack rawIron = new ItemStack(Items.RAW_IRON);
@@ -185,8 +180,7 @@ public final class McRecipeGameTest {
 
     // ---- recipe lookup -------------------------------------------------------------------------
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void recipesAreFoundByResultAndById(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
 
@@ -227,8 +221,7 @@ public final class McRecipeGameTest {
      * one acceptable item and every representative must be a member of that tag. A node that flattened the
      * ingredient list, or that reported one plank as the only option, fails one of those two.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void ingredientsNameOneItemPerSlot(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
 
@@ -263,8 +256,7 @@ public final class McRecipeGameTest {
      * anything else gives cobblestone. That makes it the one vanilla table a test can assert an exact result
      * from, and it also exercises the {@code tool} input, since the condition reads it.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void lootTableRollsAreDrivenByTheTool(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos at = helper.absolutePos(new BlockPos(1, 2, 1));
@@ -298,8 +290,7 @@ public final class McRecipeGameTest {
      * a node that only rolled the table would report cobblestone here. That is what the empty-handed
      * assertion pins.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void blockDropsDependOnTheTool(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos at = helper.absolutePos(new BlockPos(2, 2, 2));
@@ -338,8 +329,7 @@ public final class McRecipeGameTest {
 
     // ---- mining --------------------------------------------------------------------------------
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void miningQueriesComparePickaxes(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos stone = helper.absolutePos(new BlockPos(1, 2, 3));
@@ -402,8 +392,7 @@ public final class McRecipeGameTest {
      * <p>No exact tick counts here: the game's formula runs in floats and pinning 150 rather than 151 would
      * be testing rounding. The relationships are what the node promises.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void destroySpeedUsesThePlayerWhenGivenOne(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos stone = helper.absolutePos(new BlockPos(3, 2, 3));
@@ -439,8 +428,7 @@ public final class McRecipeGameTest {
      * infinity on the {@code progress} port for whatever arithmetic came next. Both now short-circuit to one
      * tick, which is true (nothing breaks in less) and finite.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void instantBlocksAgreeOnBothPaths(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos air = helper.absolutePos(new BlockPos(5, 2, 3));

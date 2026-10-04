@@ -1,8 +1,7 @@
 package com.lowdragmc.kilagraph.test.gametest.blueprint;
 
 
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
-import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.gametest.framework.GameTest;
 import com.lowdragmc.kilagraph.Kilagraph;
 import com.lowdragmc.kilagraph.blueprint.nodes.compare.LessEqualNode;
@@ -38,15 +37,12 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
  *
  * Expected: sumEven = 0 + 2 + 4 = 6.
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class ExecIntegrationGameTest {
+public final class ExecIntegrationGameTest implements FabricGameTest {
     private static final String SUM_OF_EVENS = "exec_integration_sum_of_evens";
 
-    private ExecIntegrationGameTest() {}
+    public ExecIntegrationGameTest() {}
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void sumOfEvens(GameTestHelper helper) {
         var g = newGraph();

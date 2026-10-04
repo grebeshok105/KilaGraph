@@ -1,8 +1,7 @@
 package com.lowdragmc.kilagraph.test.gametest.blueprint;
 
 
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
-import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.gametest.framework.GameTest;
 import com.lowdragmc.kilagraph.Kilagraph;
 import com.lowdragmc.kilagraph.blueprint.nodes.exec.EntryNode;
@@ -29,16 +28,14 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
  * variable (via {@code SetVar}), and a later data-pull / {@code runOutputs} on the <em>same</em>
  * executor observes that mutation. Verifies exec-flow and the variable store share one environment.
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class ExecVarInteractionGameTest {
+public final class ExecVarInteractionGameTest implements FabricGameTest {
     private static final String EXEC_SET_THEN_DATA_READ = "exec_set_then_data_read";
     private static final String EXEC_SET_THEN_RUN_OUTPUTS = "exec_set_then_run_outputs";
 
-    private ExecVarInteractionGameTest() {}
+    public ExecVarInteractionGameTest() {}
 
     /** Entry → SetVar("x", 21); then an INPUT-variable("x") get-node feeds an Add — pulled on the same executor. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void execSetThenDataRead(GameTestHelper helper) {
         var g = newGraph();
         var entry = addNode(g, EntryNode.class);
@@ -77,8 +74,7 @@ public final class ExecVarInteractionGameTest {
      * graph. {@link #execSetThenDataRead} covers the other half — a first read after a write is
      * fresh — and the two together fix the behaviour from both sides.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void aVariableReadIsMemoisedUntilClearCache(GameTestHelper helper) {
         var b = KGGraphBuilder.blueprint();
         b.variable("x", int.class, 0, VariableKind.INPUT);
@@ -112,8 +108,7 @@ public final class ExecVarInteractionGameTest {
      * store no longer consults, and the node would keep serving the removed value forever. The store
      * therefore marks entries absent in place rather than dropping them, and this is what says so.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void removingAVariableRestoresItsDefault(GameTestHelper helper) {
         var b = KGGraphBuilder.blueprint();
         b.variable("x", int.class, 5, VariableKind.INPUT);
@@ -153,8 +148,7 @@ public final class ExecVarInteractionGameTest {
     }
 
     /** Entry → SetVar("y", 9); runOutputs() harvests OUTPUT var "y" from the env fallback. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void execSetThenRunOutputs(GameTestHelper helper) {
         var g = newGraph();
         g.graphModel.createVariable("y", int.class, 0, VariableKind.OUTPUT);

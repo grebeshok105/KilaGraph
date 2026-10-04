@@ -13,8 +13,7 @@ import com.lowdragmc.kilagraph.graph.exec.GraphExecutor;
 import com.lowdragmc.kilagraph.test.gametest.KGGraphBuilder;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertEq;
 
@@ -31,14 +30,12 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertEq;
  * the executor already knows what it evaluated, so asking it is both cheaper and harder to fool
  * than a counter wired into the graph.</p>
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class LazinessGameTest {
+public final class LazinessGameTest implements FabricGameTest {
 
-    private LazinessGameTest() {}
+    public LazinessGameTest() {}
 
     /** {@code And} stops at the first false input; the rest are never evaluated. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void andShortCircuits(GameTestHelper helper) {
         var b = KGGraphBuilder.blueprint();
         b.add("and", AndNode.class).constant("and.in1", false);
@@ -53,8 +50,7 @@ public final class LazinessGameTest {
     }
 
     /** {@code Or} stops at the first true input. The mirror of {@link #andShortCircuits}. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void orShortCircuits(GameTestHelper helper) {
         var b = KGGraphBuilder.blueprint();
         b.add("or", OrNode.class).constant("or.in1", true);
@@ -68,8 +64,7 @@ public final class LazinessGameTest {
     }
 
     /** {@code Select} pulls the branch it returns and only that branch. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void selectEvaluatesOnlyTheTakenBranch(GameTestHelper helper) {
         for (boolean cond : new boolean[]{true, false}) {
             var b = KGGraphBuilder.blueprint();
@@ -95,8 +90,7 @@ public final class LazinessGameTest {
      * through its arithmetic; this asserts it directly, so a future scheduler that recomputes a
      * shared node fails here with the count rather than silently costing twice the work.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void diamondEvaluatesTheSharedNodeOnce(GameTestHelper helper) {
         var b = KGGraphBuilder.blueprint();
         b.add("shared", AddNode.class).constant("shared.in1", 3f).constant("shared.in2", 4f);
@@ -119,8 +113,7 @@ public final class LazinessGameTest {
      * {@code Cache} memoises in per-node state, which {@code clearCache()} does not touch — so its
      * upstream is pulled on the first evaluation and never again, even across generations.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void cachePullsItsSourceOnlyOnce(GameTestHelper helper) {
         var b = KGGraphBuilder.blueprint();
         b.add("src", AddNode.class).constant("src.in1", 6f).constant("src.in2", 1f);
@@ -145,8 +138,7 @@ public final class LazinessGameTest {
     }
 
     /** A node nothing demands is never evaluated, however reachable it looks in the model. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void undemandedNodesAreNotEvaluated(GameTestHelper helper) {
         var b = KGGraphBuilder.blueprint();
         b.add("wanted", AddNode.class).constant("wanted.in1", 1f).constant("wanted.in2", 2f);

@@ -32,9 +32,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.material.Fluids;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import dev.architectury.fluid.FluidStack;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import org.joml.Vector2f;
 
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.addNode;
@@ -56,10 +55,9 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
  * <p>They have nothing in common but that, so they live together here rather than being scattered into
  * files whose subject they do not share.
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class McCoverageGameTest {
+public final class McCoverageGameTest implements FabricGameTest {
 
-    private McCoverageGameTest() {
+    public McCoverageGameTest() {
     }
 
     /**
@@ -69,8 +67,7 @@ public final class McCoverageGameTest {
      * an {@code Entity} needs a way down to the narrower one. The interesting case is the failing one: a
      * pig is not a player, and the node has to say so rather than producing a broken value.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void entityCasts(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         Entity pig = helper.spawn(EntityType.PIG, new BlockPos(1, 2, 1));
@@ -103,8 +100,7 @@ public final class McCoverageGameTest {
      * here is behavioural rather than a slot count — an item put in the mainhand is visible through the
      * container — because the exact composition is NeoForge's and asserting it would test NeoForge.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void entityContainer(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         Entity cart = helper.spawn(EntityType.CHEST_MINECART, new BlockPos(1, 2, 1));
@@ -141,8 +137,7 @@ public final class McCoverageGameTest {
     }
 
     /** The nearest player within a radius, and the miss when there is none in range. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void nearestPlayer(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos where = helper.absolutePos(new BlockPos(1, 2, 1));
@@ -162,15 +157,14 @@ public final class McCoverageGameTest {
     }
 
     /** A fluid stack's data components, listed. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void fluidComponents(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
-        var empty = probe(level, DataComponentNodes.FluidComponents.class, "stack", FluidStack.EMPTY);
+        var empty = probe(level, DataComponentNodes.FluidComponents.class, "stack", FluidStack.empty());
         assertEq(helper, "an empty stack lists nothing", List.of(), empty.eval("out", List.class));
 
         var water = probe(level, DataComponentNodes.FluidComponents.class,
-                "stack", new FluidStack(Fluids.WATER, 1000));
+                "stack", FluidStack.create(Fluids.WATER, 1000));
         // Plain water carries no components; the assertion is that the node answers with a list rather
         // than null, which is what a For Each downstream depends on.
         assertTrue(helper, "and water answers with a list", water.eval("out", List.class) != null);
@@ -178,8 +172,7 @@ public final class McCoverageGameTest {
     }
 
     /** Giving an item to a player, and the chat message action. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void giveItemAndSendMessage(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);

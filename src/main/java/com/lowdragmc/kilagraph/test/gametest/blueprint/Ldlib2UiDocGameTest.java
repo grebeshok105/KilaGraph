@@ -13,8 +13,7 @@ import com.lowdragmc.lowdraglib2.gui.ui.elements.Label;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertEq;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertFalse;
@@ -28,15 +27,13 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertTrue
  * non-crashing — a wrapper that quietly nested the tree one level deeper would still parse, still
  * build a UI, and break every selector written against it.</p>
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class Ldlib2UiDocGameTest {
+public final class Ldlib2UiDocGameTest implements FabricGameTest {
 
-    private Ldlib2UiDocGameTest() {
+    public Ldlib2UiDocGameTest() {
     }
 
     /** The full document, the {@code <root>}-only form and bare elements all produce the same tree. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void allThreeXmlFormsAreEquivalent(GameTestHelper helper) {
         String[] forms = {
                 "<ui><root><button id=\"ok\"/><label id=\"caption\"/></root></ui>",
@@ -54,8 +51,7 @@ public final class Ldlib2UiDocGameTest {
     }
 
     /** An XML declaration in front of a fragment must not stop the wrapper from working. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void anXmlDeclarationIsToleratedOnAFragment(GameTestHelper helper) {
         UIElement root = parse("<?xml version=\"1.0\" encoding=\"UTF-8\"?><button id=\"ok\"/>");
         assertEq(helper, "the button parsed", 1, root.getChildren().size());
@@ -64,8 +60,7 @@ public final class Ldlib2UiDocGameTest {
     }
 
     /** Attributes are applied by the element itself, not by the wrapper. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void xmlAttributesReachTheElement(GameTestHelper helper) {
         UIElement root = parse("<button id=\"save\" class=\"primary wide\" visible=\"false\"/>");
         UIElement button = root.getChildren().getFirst();
@@ -77,8 +72,7 @@ public final class Ldlib2UiDocGameTest {
     }
 
     /** Malformed xml yields an empty UI rather than throwing — a graph mid-edit is normal. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void brokenXmlDegradesToAnEmptyUi(GameTestHelper helper) {
         var g = parseGraph("<button id=\"unclosed\"");
         var exec = new GraphExecutor(g.graph());
@@ -95,8 +89,7 @@ public final class Ldlib2UiDocGameTest {
      * <p>Templates are how a UI crosses a save file or a packet, so a structure that did not survive
      * would only be noticed once something had already been stored.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void aTemplateRoundTripPreservesTheTree(GameTestHelper helper) {
         var g = KGGraphBuilder.blueprint()
                 .add("entry", EntryNode.class)
@@ -125,8 +118,7 @@ public final class Ldlib2UiDocGameTest {
     }
 
     /** An unresolvable template path yields the Missing placeholder, not null. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void aMissingTemplatePathDegradesToMissing(GameTestHelper helper) {
         var g = KGGraphBuilder.blueprint().add("load", UIDocNodes.TemplateLoad.class);
         g.constant("load.path", "builtin(kilagraph:nothing_is_here)");
@@ -139,8 +131,7 @@ public final class Ldlib2UiDocGameTest {
     }
 
     /** A file that is not there gives an empty UI and says so, rather than failing the build. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void aMissingXmlFileDegrades(GameTestHelper helper) {
         var g = KGGraphBuilder.blueprint()
                 .add("entry", EntryNode.class)
@@ -162,8 +153,7 @@ public final class Ldlib2UiDocGameTest {
      * <p>The property that makes handlers work at all — {@code UIActions.produce} republishing from
      * node state rather than rebuilding.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void aConstructorKeepsItsIdentityAcrossPulls(GameTestHelper helper) {
         var g = parseGraph("<button id=\"ok\"/>");
         var exec = new GraphExecutor(g.graph());

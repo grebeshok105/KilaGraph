@@ -10,8 +10,7 @@ import com.lowdragmc.kilagraph.test.gametest.KGGraphBuilder;
 import com.lowdragmc.kilagraph.test.gametest.KGGraphFixtures;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 import java.util.List;
 import java.util.OptionalLong;
@@ -37,10 +36,9 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertTrue
  * <p>Not covered here: {@code Sequence} re-arming its next output. It has behaviour coverage in
  * {@code ExecSemanticsGameTest.sequenceToCompletion}, but no driver-equivalence case.</p>
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class ExecDriverGameTest {
+public final class ExecDriverGameTest implements FabricGameTest {
 
-    private ExecDriverGameTest() {}
+    public ExecDriverGameTest() {}
 
     private record Case(String name, Supplier<KGGraphBuilder> build) {}
 
@@ -58,8 +56,7 @@ public final class ExecDriverGameTest {
     }
 
     /** Same nodes, same count, same order — whichever driver ran them. */
-    @GameTest(template = "empty", timeoutTicks = 600)
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty", timeoutTicks = 600)
     public static void bothDriversRunTheSameNodes(GameTestHelper helper) {
         for (Case c : cases()) {
             var graph = c.build().get();

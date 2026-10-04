@@ -27,8 +27,7 @@ import com.lowdragmc.lowdraglib2.nodegraphtookit.model.node.PortModel;
 import java.util.List;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.addNode;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertEq;
@@ -37,8 +36,7 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.setInputCo
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.setOption;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
 
-@GameTestHolder(Kilagraph.MODID)
-public final class ListNodeGameTest {
+public final class ListNodeGameTest implements FabricGameTest {
     private static final String IS_EMPTY = "list_is_empty";
     private static final String APPEND = "list_append";
     private static final String PREPEND = "list_prepend";
@@ -56,7 +54,7 @@ public final class ListNodeGameTest {
     private static final String REPEAT = "list_repeat";
     private static final String IMMUTABILITY = "list_immutability";
 
-    private ListNodeGameTest() {}
+    public ListNodeGameTest() {}
 
     /** Build a String-typed ListCombine with the given values; return its output port. */
     private static PortModel
@@ -79,9 +77,7 @@ public final class ListNodeGameTest {
         return get.getOutputsById().get("value");
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void isEmpty(GameTestHelper helper) {
         var g = newGraph();
@@ -98,9 +94,7 @@ public final class ListNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void append(GameTestHelper helper) {
         var g = newGraph();
@@ -116,9 +110,7 @@ public final class ListNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void prepend(GameTestHelper helper) {
         var g = newGraph();
@@ -134,9 +126,7 @@ public final class ListNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void insert(GameTestHelper helper) {
         var g = newGraph();
@@ -153,9 +143,7 @@ public final class ListNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void removeAt(GameTestHelper helper) {
         var g = newGraph();
@@ -181,9 +169,7 @@ public final class ListNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void remove(GameTestHelper helper) {
         var g = newGraph();
@@ -199,9 +185,7 @@ public final class ListNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void contains(GameTestHelper helper) {
         var g = newGraph();
@@ -220,9 +204,7 @@ public final class ListNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void indexOf(GameTestHelper helper) {
         var g = newGraph();
@@ -241,9 +223,7 @@ public final class ListNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void slice(GameTestHelper helper) {
         var g = newGraph();
@@ -271,9 +251,7 @@ public final class ListNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void concat(GameTestHelper helper) {
         var g = newGraph();
@@ -290,9 +268,7 @@ public final class ListNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void reverse(GameTestHelper helper) {
         var g = newGraph();
@@ -307,9 +283,7 @@ public final class ListNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void distinct(GameTestHelper helper) {
         var g = newGraph();
@@ -325,9 +299,7 @@ public final class ListNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void sort(GameTestHelper helper) {
         var g = newGraph();
@@ -353,9 +325,7 @@ public final class ListNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void range(GameTestHelper helper) {
         var g = newGraph();
@@ -395,9 +365,7 @@ public final class ListNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void repeat(GameTestHelper helper) {
         var g = newGraph();
@@ -414,9 +382,7 @@ public final class ListNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void immutability(GameTestHelper helper) {
         // Append must not mutate the source list — evaluator can re-evaluate same source port.

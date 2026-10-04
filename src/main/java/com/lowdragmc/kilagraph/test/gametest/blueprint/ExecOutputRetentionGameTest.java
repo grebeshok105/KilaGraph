@@ -14,8 +14,7 @@ import com.lowdragmc.lowdraglib2.nodegraphtookit.api.type.TypeHandles.ExecutionF
 import com.lowdragmc.lowdraglib2.nodegraphtookit.model.node.NodeModel;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.addNode;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.newGraph;
@@ -28,10 +27,9 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
  * invalidated, and is released by the first clear with the switch off. The default is the
  * behaviour the executor always had, and the first test pins it.
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class ExecOutputRetentionGameTest {
+public final class ExecOutputRetentionGameTest implements FabricGameTest {
 
-    private ExecOutputRetentionGameTest() {}
+    public ExecOutputRetentionGameTest() {}
 
     /**
      * An exec node that publishes a number and a reference from {@code execute()}: the number is
@@ -114,8 +112,7 @@ public final class ExecOutputRetentionGameTest {
     }
 
     /** The default: a clear drops what the exec node published, and a read falls through to evaluate(). */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void byDefaultAClearDropsWhatAnExecNodePublished(GameTestHelper helper) {
         Fixture f = Fixture.build();
         f.exec.executeFrom(f.publish);
@@ -125,8 +122,7 @@ public final class ExecOutputRetentionGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void retainedPublicationsSurviveClearsOnBothLanesUntilTheSwitchIsOff(GameTestHelper helper) {
         Fixture f = Fixture.build();
         f.exec.executeFrom(f.publish);
@@ -150,8 +146,7 @@ public final class ExecOutputRetentionGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void aRepublicationWhileRetainingIsWhatIsReadAfterwards(GameTestHelper helper) {
         Fixture f = Fixture.build();
         f.exec.retainExecOutputs(true);
@@ -165,8 +160,7 @@ public final class ExecOutputRetentionGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void anInvalidatedPublicationIsNotBroughtBackByRetention(GameTestHelper helper) {
         Fixture f = Fixture.build();
         f.exec.retainExecOutputs(true);

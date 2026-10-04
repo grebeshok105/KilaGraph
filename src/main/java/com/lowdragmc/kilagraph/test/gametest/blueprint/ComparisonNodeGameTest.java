@@ -1,8 +1,7 @@
 package com.lowdragmc.kilagraph.test.gametest.blueprint;
 
 
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
-import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.gametest.framework.GameTest;
 import com.lowdragmc.kilagraph.Kilagraph;
 import com.lowdragmc.kilagraph.blueprint.nodes.compare.GreaterEqualNode;
@@ -23,15 +22,14 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.setInputCo
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.valueSource;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
 
-@GameTestHolder(Kilagraph.MODID)
-public final class ComparisonNodeGameTest {
+public final class ComparisonNodeGameTest implements FabricGameTest {
     private static final String GT = "cmp_greater_than";
     private static final String GE = "cmp_greater_equal";
     private static final String LT = "cmp_less_than";
     private static final String LE = "cmp_less_equal";
     private static final String NEQ = "cmp_not_equals";
 
-    private ComparisonNodeGameTest() {}
+    public ComparisonNodeGameTest() {}
 
     /** Reusable: runs a 2-arg comparison node with the given a/b and asserts the out. */
     private static void cmpCase(GameTestHelper helper, Class<? extends Node> nodeClass,
@@ -44,9 +42,7 @@ public final class ComparisonNodeGameTest {
         assertEq(helper, label + " " + a + "?" + b, expected, actual);
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void greaterThan(GameTestHelper helper) {
         cmpCase(helper, GreaterThanNode.class, ">", 5f, 3f, true);
@@ -55,9 +51,7 @@ public final class ComparisonNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void greaterEqual(GameTestHelper helper) {
         cmpCase(helper, GreaterEqualNode.class, ">=", 5f, 3f, true);
@@ -66,9 +60,7 @@ public final class ComparisonNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void lessThan(GameTestHelper helper) {
         cmpCase(helper, LessThanNode.class, "<", 3f, 5f, true);
@@ -77,9 +69,7 @@ public final class ComparisonNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void lessEqual(GameTestHelper helper) {
         cmpCase(helper, LessEqualNode.class, "<=", 3f, 5f, true);
@@ -88,9 +78,7 @@ public final class ComparisonNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void notEquals(GameTestHelper helper) {
         // Two AddNodes producing different Float values: 1.0 vs 2.0 → not equal
@@ -129,8 +117,7 @@ public final class ComparisonNodeGameTest {
      * the editor shows which type a wire carries, so the only way to find out was for a graph to
      * misbehave.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void notEqualsComparesNumbersByValue(GameTestHelper helper) {
         record Case(String label, Class<?> ta, Object a, Class<?> tb, Object b, boolean differ) {}
         var cases = new Case[]{
@@ -157,8 +144,7 @@ public final class ComparisonNodeGameTest {
     }
 
     /** Non-numbers keep {@code Objects.equals}, nulls included. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void notEqualsStillComparesNonNumbersByEquals(GameTestHelper helper) {
         var g = newGraph();
         var n = addNode(g, NotEqualsNode.class);

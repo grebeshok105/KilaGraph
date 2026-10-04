@@ -29,7 +29,7 @@ import org.joml.Vector2f;
  * themselves at mod load.
  */
 public final class KGGameTestHelpers {
-    private KGGameTestHelpers() {}
+    public KGGameTestHelpers() {}
 
     /** Fresh BlueprintGraph with KGTypeHandles bootstrapped. */
     public static BlueprintGraph newGraph() {

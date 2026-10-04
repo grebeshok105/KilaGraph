@@ -14,8 +14,7 @@ import com.lowdragmc.kilagraph.graph.exec.GraphExecutor;
 import com.lowdragmc.lowdraglib2.nodegraphtookit.model.node.NodeModel;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.addNode;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertEq;
@@ -24,8 +23,7 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.setInputCo
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.setOption;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
 
-@GameTestHolder(Kilagraph.MODID)
-public final class ExecPrimitivesGameTest {
+public final class ExecPrimitivesGameTest implements FabricGameTest {
     private static final String SEQUENCE = "exec_sequence_fires_in_order";
     private static final String BRANCH_TRUE = "exec_branch_true";
     private static final String BRANCH_FALSE = "exec_branch_false";
@@ -34,7 +32,7 @@ public final class ExecPrimitivesGameTest {
     private static final String SWITCH_MATCH = "exec_switch_match";
     private static final String SWITCH_DEFAULT = "exec_switch_default";
 
-    private ExecPrimitivesGameTest() {}
+    public ExecPrimitivesGameTest() {}
 
     /** Helper: Add node emitting a Float constant. */
     private static NodeModel
@@ -45,9 +43,7 @@ public final class ExecPrimitivesGameTest {
         return add;
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void sequence(GameTestHelper helper) {
         // Entry → Sequence(3 outs) → 3 Print nodes
@@ -79,17 +75,13 @@ public final class ExecPrimitivesGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void branchTrue(GameTestHelper helper) {
         runBranch(helper, true, "true-branch", "false-branch", "true-branch");
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void branchFalse(GameTestHelper helper) {
         runBranch(helper, false, "true-branch", "false-branch", "false-branch");
@@ -124,17 +116,13 @@ public final class ExecPrimitivesGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void gateOpen(GameTestHelper helper) {
         runGate(helper, true, true);
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void gateClosed(GameTestHelper helper) {
         runGate(helper, false, false);
@@ -158,9 +146,7 @@ public final class ExecPrimitivesGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void switchMatch(GameTestHelper helper) {
         // 3 cases, selector=2 → case2 fires
@@ -192,9 +178,7 @@ public final class ExecPrimitivesGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void switchDefault(GameTestHelper helper) {
         // 2 cases, selector=99 → default

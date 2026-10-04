@@ -36,8 +36,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.addBlock;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.addNode;
@@ -55,18 +54,16 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.setInputCo
  * Minecraft, while asserting the block reports whatever {@code EntityType.PIG.getHeight()} returns is
  * testing the block. The few literals are ones this test set itself.
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class McInfoBlockGameTest {
+public final class McInfoBlockGameTest implements FabricGameTest {
 
     private static final float EPS = 1.0e-4f;
 
-    private McInfoBlockGameTest() {
+    public McInfoBlockGameTest() {
     }
 
     // ---- Level -------------------------------------------------------------------------------
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void levelBlocks(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         var probe = new Probe(LevelInfoNode.class, level);
@@ -112,8 +109,7 @@ public final class McInfoBlockGameTest {
 
     // ---- Entity ------------------------------------------------------------------------------
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void entityBlocks(GameTestHelper helper) {
         Entity pig = helper.spawn(EntityType.PIG, new BlockPos(2, 2, 2));
         var probe = new Probe(EntityInfoNode.class, pig);
@@ -174,8 +170,7 @@ public final class McInfoBlockGameTest {
      * block refusing to evaluate. This is the case a reflective context could not express, because the
      * getter is not on {@code Entity}.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void healthOnANonLivingEntity(GameTestHelper helper) {
         Entity arrow = helper.spawn(EntityType.ARROW, new BlockPos(2, 2, 2));
         var health = new Probe(EntityInfoNode.class, arrow).block(EntityInfoBlocks.Health.class);
@@ -187,8 +182,7 @@ public final class McInfoBlockGameTest {
 
     // ---- Player ------------------------------------------------------------------------------
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void playerBlocks(GameTestHelper helper) {
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.DIAMOND_SWORD));
@@ -228,8 +222,7 @@ public final class McInfoBlockGameTest {
 
     // ---- BlockEntity -------------------------------------------------------------------------
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void blockEntityBlocks(GameTestHelper helper) {
         BlockPos relative = new BlockPos(1, 2, 1);
         helper.setBlock(relative, Blocks.CHEST);

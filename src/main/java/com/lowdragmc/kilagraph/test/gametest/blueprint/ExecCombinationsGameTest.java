@@ -1,8 +1,7 @@
 package com.lowdragmc.kilagraph.test.gametest.blueprint;
 
 
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
-import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.gametest.framework.GameTest;
 import com.lowdragmc.kilagraph.Kilagraph;
 import com.lowdragmc.kilagraph.blueprint.BlueprintGraph;
@@ -41,15 +40,14 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
  *   <li>A {@code Sequence} of loops running each loop to completion in order.</li>
  * </ul>
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class ExecCombinationsGameTest {
+public final class ExecCombinationsGameTest implements FabricGameTest {
     private static final String NESTED_ACCUM = "exec_nested_loop_accumulates";
     private static final String BREAK_INNER_SCOPED = "exec_break_inner_loop_scoped";
     private static final String BREAK_IN_SEQUENCE = "exec_break_in_sequence_unwinds_to_loop";
     private static final String WHILE_TERMINATES = "exec_while_terminates_on_condition";
     private static final String SEQUENCE_OF_LOOPS = "exec_sequence_of_loops";
 
-    private ExecCombinationsGameTest() {}
+    public ExecCombinationsGameTest() {}
 
     // ---- shared builders -------------------------------------------------------------------
 
@@ -91,8 +89,7 @@ public final class ExecCombinationsGameTest {
     // ---- tests -----------------------------------------------------------------------------
 
     /** For(3) {@code ×} For(2), body increments counter. 3×2 = 6 body executions. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void nestedLoopAccumulates(GameTestHelper helper) {
         var g = newGraph();
         var counter = intVar(g, "counter");
@@ -117,8 +114,7 @@ public final class ExecCombinationsGameTest {
      * ends only the inner loop (2 increments per outer pass: indices 0,1), so the outer still runs
      * all 3 passes → counter = 3 × 2 = 6. If Break leaked to the outer loop, counter would be 2.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void breakInInnerLoopScoped(GameTestHelper helper) {
         var g = newGraph();
         var counter = intVar(g, "counter");
@@ -157,8 +153,7 @@ public final class ExecCombinationsGameTest {
      * Final a=1, b=1. A Break that didn't propagate through Sequence (or didn't reach the loop) would
      * leave b=2 or loop further.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void breakInSequenceUnwindsToLoop(GameTestHelper helper) {
         var g = newGraph();
         var a = intVar(g, "a");
@@ -202,8 +197,7 @@ public final class ExecCombinationsGameTest {
      * While(cond = counter {@code <} 3), body increments counter, maxIterations=1000. The loop must
      * stop because the re-pulled condition goes false (counter reaches 3), not because of the cap.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void whileTerminatesOnCondition(GameTestHelper helper) {
         var g = newGraph();
         var counter = intVar(g, "counter");
@@ -230,8 +224,7 @@ public final class ExecCombinationsGameTest {
      * Sequence(2): out1 = For(2) incrementing counter, out2 = For(3) incrementing counter. out1's
      * loop runs fully before out2's → counter = 2 + 3 = 5.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void sequenceOfLoops(GameTestHelper helper) {
         var g = newGraph();
         var counter = intVar(g, "counter");

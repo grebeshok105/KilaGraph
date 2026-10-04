@@ -10,8 +10,8 @@ import com.lowdragmc.lowdraglib2.nodegraphtookit.api.node.NodeAttribute;
 import com.lowdragmc.lowdraglib2.nodegraphtookit.api.type.TypeHandles.ExecutionFlow;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.IItemHandlerModifiable;
+import com.lowdragmc.lowdraglib2.utils.items.IItemHandler;
+import com.lowdragmc.lowdraglib2.utils.items.IItemHandlerModifiable;
 
 /**
  * Moving items in and out of an inventory. See {@link McActions} for the rules every action shares, and

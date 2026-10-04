@@ -20,8 +20,7 @@ import com.lowdragmc.lowdraglib2.nodegraphtookit.api.node.Node;
 import com.lowdragmc.lowdraglib2.nodegraphtookit.model.node.NodeModel;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 import java.util.Map;
 
@@ -35,15 +34,13 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.setOption;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.valueSource;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
 
-@GameTestHolder(Kilagraph.MODID)
-public final class MathNodeExtrasGameTest {
+public final class MathNodeExtrasGameTest implements FabricGameTest {
     private static final float EPS = 1e-4f;
 
-    private MathNodeExtrasGameTest() {
+    public MathNodeExtrasGameTest() {
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void wrapFoldsFromBothSides(GameTestHelper helper) {
         assertEq(helper, "370 into [0,360)", 10f, wrap(370f, 0f, 360f), EPS);
         assertEq(helper, "-10 into [0,360)", 350f, wrap(-10f, 0f, 360f), EPS);
@@ -65,8 +62,7 @@ public final class MathNodeExtrasGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void wrapOnATickCounterIsExact(GameTestHelper helper) {
         long first = 16_777_216L;
         Object a = wrapLong(first, 0f, 40f);
@@ -83,8 +79,7 @@ public final class MathNodeExtrasGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void deltaAngleTakesTheShortWay(GameTestHelper helper) {
         assertEq(helper, "179 to -179", 2f, delta(179f, -179f), EPS);
         assertEq(helper, "-179 to 179", -2f, delta(-179f, 179f), EPS);
@@ -100,8 +95,7 @@ public final class MathNodeExtrasGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void moveTowardsArrivesExactly(GameTestHelper helper) {
         assertEq(helper, "one step up", 2f, moveTowards(0f, 10f, 2f), EPS);
         assertEq(helper, "one step down", -2f, moveTowards(0f, -10f, 2f), EPS);
@@ -123,8 +117,7 @@ public final class MathNodeExtrasGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void nearlyEqualsForgivesFloatDrift(GameTestHelper helper) {
         float drifted = 0f;
         for (int i = 0; i < 10; i++) drifted += 0.1f;
@@ -140,8 +133,7 @@ public final class MathNodeExtrasGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void smoothstepIsClampedAndEased(GameTestHelper helper) {
         assertEq(helper, "below the range", 0f, smoothstep(-5f, 0f, 10f), EPS);
         assertEq(helper, "at the bottom", 0f, smoothstep(0f, 0f, 10f), EPS);
@@ -161,8 +153,7 @@ public final class MathNodeExtrasGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void stepSwitchesAtTheEdgeInclusive(GameTestHelper helper) {
         assertEq(helper, "below", 0f, step(4.9f, 5f), EPS);
         assertEq(helper, "exactly at the edge", 1f, step(5f, 5f), EPS);
@@ -171,8 +162,7 @@ public final class MathNodeExtrasGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void inverseLerpInvertsLerp(GameTestHelper helper) {
         assertEq(helper, "bottom", 0f, inverseLerp(10f, 20f, 10f), EPS);
         assertEq(helper, "middle", 0.5f, inverseLerp(10f, 20f, 15f), EPS);
@@ -190,8 +180,7 @@ public final class MathNodeExtrasGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void snapQuantisesAndAgreesWithRoundAtOne(GameTestHelper helper) {
         assertEq(helper, "onto halves", 2.5f, snap(2.6f, 0.5f), EPS);
         assertEq(helper, "onto 45s, rounding up", 45f, snap(30f, 45f), EPS);
@@ -208,8 +197,7 @@ public final class MathNodeExtrasGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void wavesAreBoundedAndPeriodic(GameTestHelper helper) {
         for (WaveNode.Op op : WaveNode.Op.values()) {
             for (int i = 0; i <= 16; i++) {
@@ -239,8 +227,7 @@ public final class MathNodeExtrasGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void trigStillAnswersAndNowHasHyperbolics(GameTestHelper helper) {
         assertEq(helper, "sin(0)", 0f, trig(0f, TrigNode.Op.SIN), EPS);
         assertEq(helper, "cos(0)", 1f, trig(0f, TrigNode.Op.COS), EPS);

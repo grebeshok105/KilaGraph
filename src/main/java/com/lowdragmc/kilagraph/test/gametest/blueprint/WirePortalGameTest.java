@@ -1,8 +1,7 @@
 package com.lowdragmc.kilagraph.test.gametest.blueprint;
 
 
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
-import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.gametest.framework.GameTest;
 import com.lowdragmc.kilagraph.Kilagraph;
 import com.lowdragmc.kilagraph.blueprint.BlueprintGraph;
@@ -35,14 +34,13 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
  * shared {@link DeclarationModel}. Covers exec-flow across a portal (incl. multi-exit fan-out),
  * single-stepping across a portal, and a data value reference end-to-end.
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class WirePortalGameTest {
+public final class WirePortalGameTest implements FabricGameTest {
     private static final String EXEC = "portal_exec_across";
     private static final String MULTI = "portal_exec_multi_exit";
     private static final String STEP = "portal_step_across";
     private static final String VALUE = "portal_value_reference";
 
-    private WirePortalGameTest() {}
+    public WirePortalGameTest() {}
 
     // ---- helpers --------------------------------------------------------------------------------
 
@@ -62,8 +60,7 @@ public final class WirePortalGameTest {
     }
 
     // ---- 1. exec flow crosses a portal ------------------------------------------------------
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void execAcross(GameTestHelper helper) {
         var g = newGraph();
         var start = addNode(g, EntryNode.class);
@@ -82,8 +79,7 @@ public final class WirePortalGameTest {
     }
 
     // ---- 2. one exec entry, two exec exits → both downstreams fire --------------------------
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void execMultiExit(GameTestHelper helper) {
         var g = newGraph();
         var start = addNode(g, EntryNode.class);
@@ -106,8 +102,7 @@ public final class WirePortalGameTest {
     }
 
     // ---- 3. single-stepping reaches the node past the exit portal ---------------------------
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void stepAcross(GameTestHelper helper) {
         var g = newGraph();
         var start = addNode(g, EntryNode.class);
@@ -130,8 +125,7 @@ public final class WirePortalGameTest {
     }
 
     // ---- 4. data value reference across a portal --------------------------------------------
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void valueReference(GameTestHelper helper) {
         var g = newGraph();
         var producer = addNode(g, AddNode.class);

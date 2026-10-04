@@ -18,8 +18,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.addNode;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertEq;
@@ -37,14 +36,12 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.setInputCo
  * registries, so an unknown id yields {@code air}/{@code air}/{@code empty} rather than nothing — which
  * is why every lookup node has a {@code found} output and why every test below asserts it.
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class McIdTagGameTest {
+public final class McIdTagGameTest implements FabricGameTest {
 
-    private McIdTagGameTest() {
+    public McIdTagGameTest() {
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void idsAreBuiltAndParsed(GameTestHelper helper) {
         var create = node(McIdNodes.Create.class, "namespace", "minecraft", "path", "diamond");
         assertEq(helper, "create", ResourceLocation.fromNamespaceAndPath("minecraft", "diamond"),
@@ -71,8 +68,7 @@ public final class McIdTagGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void registryLookupsRoundTrip(GameTestHelper helper) {
         assertRoundTrip(helper, "item", McIdNodes.ItemFromId.class, McIdNodes.ItemId.class,
                 "minecraft:diamond", Items.DIAMOND);
@@ -92,8 +88,7 @@ public final class McIdTagGameTest {
      * did nothing but return {@code registry.get(id)} would pass every test above while quietly turning
      * a typo into {@code minecraft:air}.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void unknownIdsAreNotSilentlyDefaulted(GameTestHelper helper) {
         for (var cls : List.of(McIdNodes.ItemFromId.class, McIdNodes.BlockFromId.class,
                 McIdNodes.FluidFromId.class, McIdNodes.EntityTypeFromId.class)) {
@@ -106,8 +101,7 @@ public final class McIdTagGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void tagMembershipIsTestedPerRegistry(GameTestHelper helper) {
         // minecraft:planks holds every plank; oak is in it and stone is not.
         var oak = node(McTagNodes.BlockInTag.class, "block", Blocks.OAK_PLANKS,
@@ -149,8 +143,7 @@ public final class McIdTagGameTest {
      * <p>These tags are also datapack-loaded rather than hard-coded, so a non-empty result is what proves
      * the no-world lookup in {@code TagContentsNodes} actually sees a loaded server's tags.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void tagContentsAreListedPerRegistry(GameTestHelper helper) {
         var planks = node(TagContentsNodes.ItemsInTag.class, "tag", id("minecraft:planks"));
         assertTrue(helper, "the planks tag exists", eval(planks, "found", Boolean.class));

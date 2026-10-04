@@ -1,8 +1,7 @@
 package com.lowdragmc.kilagraph.test.gametest.blueprint;
 
 
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
-import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.gametest.framework.GameTest;
 import com.lowdragmc.kilagraph.Kilagraph;
 import com.lowdragmc.kilagraph.blueprint.nodes.mc.geometry.BlockPosCreateNode;
@@ -29,15 +28,14 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.setInputCo
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
 
 /** Pure-data MC nodes: construct/destructure, conversions, tags. */
-@GameTestHolder(Kilagraph.MODID)
-public final class McDataGameTest {
+public final class McDataGameTest implements FabricGameTest {
     private static final String BLOCK_POS_ROUND_TRIP = "mc_block_pos_round_trip";
     private static final String ITEM_STACK_CREATE_READ = "mc_item_stack_create_read";
     private static final String BLOCK_ITEM_ROUND_TRIP = "mc_block_item_round_trip";
     private static final String DIRECTION_OPS = "mc_direction_ops";
     private static final String ITEM_IN_TAG = "mc_item_in_tag_test";
 
-    private McDataGameTest() {}
+    public McDataGameTest() {}
 
     /**
      * BlockPosCreate(3,4,5) → mc_block_pos_unpack reads it back.
@@ -46,8 +44,7 @@ public final class McDataGameTest {
      * integers, so it no longer has a reflective context at all — this is the round trip it always was,
      * against the node that replaced it.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void blockPosRoundTrip(GameTestHelper helper) {
         var g = newGraph();
         var create = addNode(g, BlockPosCreateNode.class);
@@ -68,8 +65,7 @@ public final class McDataGameTest {
     }
 
     /** ItemStackCreate(diamond, 5) → mc_item_stack_unpack and mc_item_stack_limits read it back. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void itemStackCreateRead(GameTestHelper helper) {
         var g = newGraph();
         var create = addNode(g, ItemStackCreateNode.class);
@@ -92,8 +88,7 @@ public final class McDataGameTest {
     }
 
     /** stone → BlockToItem → ItemToBlock round-trips back to stone. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void blockItemRoundTrip(GameTestHelper helper) {
         var g = newGraph();
         // The block comes from the port's own constant. A dedicated "block constant" node used to
@@ -113,8 +108,7 @@ public final class McDataGameTest {
 
 
     /** Oak planks are in minecraft:planks; a diamond is not. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void itemInTag(GameTestHelper helper) {
         var g = newGraph();
         var inTag = addNode(g, ItemInTagNode.class);

@@ -9,8 +9,7 @@ import com.lowdragmc.lowdraglib2.nodegraphtookit.model.node.NodeModel;
 import com.lowdragmc.lowdraglib2.nodegraphtookit.model.node.PortModel;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.ParameterizedType;
@@ -53,13 +52,11 @@ import java.util.List;
  * {@code lookupOverride} instead states the actual invariant, and a type registered in
  * {@code KGTypeHandles} tomorrow is covered without anyone remembering to come back here.
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class PortConstantTypeGameTest {
+public final class PortConstantTypeGameTest implements FabricGameTest {
 
-    private PortConstantTypeGameTest() {}
+    public PortConstantTypeGameTest() {}
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void overriddenTypesUseTheCanonicalHandle(GameTestHelper helper) {
         KGTypeHandles.init();
         var failures = new ArrayList<String>();

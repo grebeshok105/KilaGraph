@@ -23,8 +23,7 @@ import com.lowdragmc.lowdraglib2.nodegraphtookit.model.node.PortModel;
 import java.util.List;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.addNode;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertEq;
@@ -43,10 +42,9 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
  * evaluation — which is every test in the suite, because they all build a graph, run it once and
  * drop the executor.</p>
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class ExecutorEdgeCaseGameTest {
+public final class ExecutorEdgeCaseGameTest implements FabricGameTest {
 
-    private ExecutorEdgeCaseGameTest() {}
+    public ExecutorEdgeCaseGameTest() {}
 
     // ---- special float values through the numeric lane --------------------------------------
 
@@ -58,8 +56,7 @@ public final class ExecutorEdgeCaseGameTest {
      * {@code floatToRawIntBits} does not, and -0.0 is only distinguishable from 0.0 by its sign
      * bit. {@code Pow} is unguarded, so it is the way to produce them from a real node.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void specialFloatsSurviveTheNumericLane(GameTestHelper helper) {
         // pow(0, -1) = +Inf ; pow(-1, 0.5) = NaN -- and note WHICH NaN: Math.pow returns a
         // *negative* NaN here (0xffc00000), not the canonical Float.NaN (0x7fc00000). Comparing
@@ -105,8 +102,7 @@ public final class ExecutorEdgeCaseGameTest {
      * {@code toString} is observable through {@code ToString}, and {@code Objects.equals} through
      * {@code Equals}. A float must render "2.5", an int "3".
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void numericLaneRendersAsTheRightType(GameTestHelper helper) {
         var g = newGraph();
 
@@ -131,8 +127,7 @@ public final class ExecutorEdgeCaseGameTest {
     }
 
     /** An int-producing node feeding a float input, and a float-producing node feeding an int input. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void valuesCrossBetweenIntAndFloatPorts(GameTestHelper helper) {
         var g = newGraph();
 
@@ -168,8 +163,7 @@ public final class ExecutorEdgeCaseGameTest {
      * evaluation would return a different number. Its own javadoc relies on the port cache for
      * "same evaluator, same roll", which makes it the right probe for the slot table's memoisation.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void aDiamondEvaluatesTheSharedNodeOnce(GameTestHelper helper) {
         var g = newGraph();
         var rand = addNode(g, RandomNode.class);
@@ -201,8 +195,7 @@ public final class ExecutorEdgeCaseGameTest {
      * not a name-keyed map lookup. Caching the <em>value</em> instead would pass every other test in
      * the suite and break exactly this.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void anEditedConstantIsVisibleAfterClearCache(GameTestHelper helper) {
         var g = newGraph();
         var add = addNode(g, AddNode.class);
@@ -223,8 +216,7 @@ public final class ExecutorEdgeCaseGameTest {
      * Two executors over one graph share a single prepared form. Neither may be left holding a
      * stale view after the other triggers a rebuild.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void twoExecutorsOverOneGraphBothSeeAnEdit(GameTestHelper helper) {
         var g = newGraph();
         var five = addNode(g, AddNode.class);
@@ -256,8 +248,7 @@ public final class ExecutorEdgeCaseGameTest {
     }
 
     /** A frozen executor must agree with an unfrozen one on a graph nobody edited. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void frozenAgreesWithUnfrozen(GameTestHelper helper) {
         var g = newGraph();
         NodeModel tail = null;
@@ -292,8 +283,7 @@ public final class ExecutorEdgeCaseGameTest {
      * tables, the cycle-detection stack, and the depth-indexed context pools. They are grown in
      * separate places, so growing one and forgetting another is the shape of bug this catches.
      */
-    @GameTest(template = "empty", timeoutTicks = 400)
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty", timeoutTicks = 400)
     public static void aDeepChainGrowsEveryTable(GameTestHelper helper) {
         final int depth = 300;
         var g = newGraph();
@@ -324,8 +314,7 @@ public final class ExecutorEdgeCaseGameTest {
      * detection. If an exception skipped either unwind, the damage would not show at the throw — it
      * would show on the next unrelated evaluation, which is what this checks.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void anExecutorSurvivesANodeThatThrows(GameTestHelper helper) {
         var g = newGraph();
         var get = addNode(g, ListGetNode.class);      // list defaults to empty
@@ -389,8 +378,7 @@ public final class ExecutorEdgeCaseGameTest {
      * matters and is part of the semantics: once {@code evaluate()} runs it publishes <em>all</em>
      * outputs, so the exec-staged one has to be read first.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void execStagedOutputsPublishAndUnsetOnesFallThrough(GameTestHelper helper) {
         var g = newGraph();
         var entry = addNode(g, EntryNode.class);

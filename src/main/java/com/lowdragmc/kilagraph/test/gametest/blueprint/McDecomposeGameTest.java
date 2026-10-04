@@ -33,9 +33,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import dev.architectury.fluid.FluidStack;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.addNode;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertEq;
@@ -57,18 +56,16 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.setInputCo
  * {@code Blocks.STONE.getFriction()} returns is testing the node. The literals that remain — the
  * coordinates, the item counts — are values the test supplies itself.
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class McDecomposeGameTest {
+public final class McDecomposeGameTest implements FabricGameTest {
 
     private static final float EPS = 1.0e-4f;
 
-    private McDecomposeGameTest() {
+    public McDecomposeGameTest() {
     }
 
     // ---- geometry ----------------------------------------------------------------------------
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void blockPosUnpack(GameTestHelper helper) {
         var n = probe(BlockPosNodes.Unpack.class, "in", new BlockPos(3, -4, 5));
         assertEq(helper, "x", 3, n.eval("x", Integer.class).intValue());
@@ -90,8 +87,7 @@ public final class McDecomposeGameTest {
      * {@code McConvert} documents and that the raycast node was already caught on once, at gametest
      * coordinates of about 1.3e7.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void aabbUnpackAndCentre(GameTestHelper helper) {
         AABB box = new AABB(1e7 + 0.5, 2.25, 3, 1e7 + 4.5, 8, 13);
         var u = probe(AabbNodes.Unpack.class, "in", box);
@@ -117,8 +113,7 @@ public final class McDecomposeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void chunkPosUnpack(GameTestHelper helper) {
         ChunkPos chunk = new ChunkPos(2, -3);
         var n = probe(ChunkPosNodes.Unpack.class, "in", chunk);
@@ -134,8 +129,7 @@ public final class McDecomposeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void directionData(GameTestHelper helper) {
         for (Direction d : Direction.values()) {
             var n = probe(DirectionNodes.Data.class, "in", d);
@@ -151,8 +145,7 @@ public final class McDecomposeGameTest {
 
     // ---- identifiers and NBT -----------------------------------------------------------------
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void idUnpack(GameTestHelper helper) {
         var n = probe(McIdNodes.Unpack.class, "in", ResourceLocation.fromNamespaceAndPath("kilagraph", "some/path"));
         assertEq(helper, "namespace", "kilagraph", n.eval("namespace", String.class));
@@ -166,8 +159,7 @@ public final class McDecomposeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void nbtKeys(GameTestHelper helper) {
         CompoundTag tag = new CompoundTag();
         tag.putInt("zeta", 1);
@@ -188,8 +180,7 @@ public final class McDecomposeGameTest {
 
     // ---- blocks ------------------------------------------------------------------------------
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void blockStateBlockAndFlags(GameTestHelper helper) {
         assertEq(helper, "state → block", Blocks.STONE,
                 probe(BlockStateNodes.StateBlock.class, "in", Blocks.STONE.defaultBlockState())
@@ -231,8 +222,7 @@ public final class McDecomposeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void blockProps(GameTestHelper helper) {
         var stone = probe(BlockStateNodes.BlockProps.class, "in", Blocks.STONE);
         assertEq(helper, "friction", Blocks.STONE.getFriction(), stone.eval("friction", Float.class), EPS);
@@ -253,8 +243,7 @@ public final class McDecomposeGameTest {
 
     // ---- items -------------------------------------------------------------------------------
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void itemStackUnpackDamageLimits(GameTestHelper helper) {
         ItemStack stack = new ItemStack(Items.DIAMOND, 7);
         var u = probe(ItemStackNodes.Unpack.class, "stack", stack);
@@ -290,8 +279,7 @@ public final class McDecomposeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void itemProps(GameTestHelper helper) {
         var n = probe(ItemStackNodes.ItemProps.class, "in", Items.DIAMOND);
         assertEq(helper, "maxStackSize", Items.DIAMOND.getDefaultMaxStackSize(),
@@ -305,17 +293,16 @@ public final class McDecomposeGameTest {
 
     // ---- fluids ------------------------------------------------------------------------------
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void fluidStackUnpackAndBucket(GameTestHelper helper) {
-        var n = probe(FluidNodes.Unpack.class, "stack", new FluidStack(Fluids.WATER, 250));
+        var n = probe(FluidNodes.Unpack.class, "stack", FluidStack.create(Fluids.WATER, 250));
         assertEq(helper, "fluid", Fluids.WATER, n.eval("fluid", Fluid.class));
         assertEq(helper, "amount", 250, n.eval("amount", Integer.class).intValue());
         assertFalse(helper, "not empty", n.eval("empty", Boolean.class));
         assertTrue(helper, "has a display name", !n.eval("name", Component.class).getString().isEmpty());
 
         assertTrue(helper, "EMPTY is empty",
-                probe(FluidNodes.Unpack.class, "stack", FluidStack.EMPTY).eval("empty", Boolean.class));
+                probe(FluidNodes.Unpack.class, "stack", FluidStack.empty()).eval("empty", Boolean.class));
 
         assertEq(helper, "water's bucket", Items.WATER_BUCKET,
                 probe(FluidNodes.Bucket.class, "in", Fluids.WATER).eval("out", Item.class));
@@ -326,8 +313,7 @@ public final class McDecomposeGameTest {
 
     // ---- entity types ------------------------------------------------------------------------
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void entityTypeProps(GameTestHelper helper) {
         var pig = probe(EntityTypeNodes.Props.class, "in", EntityType.PIG);
         assertEq(helper, "width", EntityType.PIG.getWidth(), pig.eval("width", Float.class), EPS);

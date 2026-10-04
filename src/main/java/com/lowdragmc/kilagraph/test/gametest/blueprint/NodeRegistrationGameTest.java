@@ -8,8 +8,7 @@ import com.lowdragmc.lowdraglib2.nodegraphtookit.api.node.Node;
 import com.lowdragmc.lowdraglib2.nodegraphtookit.api.node.NodeAttribute;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -19,8 +18,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-@GameTestHolder(Kilagraph.MODID)
-public final class NodeRegistrationGameTest {
+public final class NodeRegistrationGameTest implements FabricGameTest {
     private static final String[] RECENT_NODES = {
             "vector_to_vec2", "vector_to_vec3", "vector_to_vec4",
 
@@ -35,11 +33,10 @@ public final class NodeRegistrationGameTest {
             "quat_rotate_vector", "quat_angle_between", "quat_to_vec4", "quat_from_vec4",
     };
 
-    private NodeRegistrationGameTest() {
+    public NodeRegistrationGameTest() {
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void theRecentNodesAreInTheLibrary(GameTestHelper helper) {
         List<String> failures = new ArrayList<>();
         for (String id : RECENT_NODES) {
@@ -66,8 +63,7 @@ public final class NodeRegistrationGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void everyRegisteredNodeOwnsItsId(GameTestHelper helper) {
         List<String> failures = new ArrayList<>();
         for (Map.Entry<String, Class<? extends Node>> e : registeredNodes().entrySet()) {
@@ -85,8 +81,7 @@ public final class NodeRegistrationGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void everyRegisteredNodeIsNamedInBothLanguages(GameTestHelper helper) {
         JsonObject en = lang(helper, "en_us");
         JsonObject zh = lang(helper, "zh_cn");
@@ -116,8 +111,7 @@ public final class NodeRegistrationGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void theTwoLanguagesCoverTheSameKeys(GameTestHelper helper) {
         JsonObject en = lang(helper, "en_us");
         JsonObject zh = lang(helper, "zh_cn");

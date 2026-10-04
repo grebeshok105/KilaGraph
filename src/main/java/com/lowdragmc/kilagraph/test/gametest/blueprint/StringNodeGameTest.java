@@ -29,8 +29,7 @@ import com.lowdragmc.lowdraglib2.nodegraphtookit.model.node.NodeModel;
 import java.util.List;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.addNode;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertEq;
@@ -39,8 +38,7 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.setInputCo
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.setOption;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
 
-@GameTestHolder(Kilagraph.MODID)
-public final class StringNodeGameTest {
+public final class StringNodeGameTest implements FabricGameTest {
     private static final String CONCAT = "string_concat";
     private static final String LENGTH = "string_length";
     private static final String SUBSTRING = "string_substring";
@@ -55,11 +53,9 @@ public final class StringNodeGameTest {
     private static final String STARTS_WITH = "string_starts_with";
     private static final String ENDS_WITH = "string_ends_with";
 
-    private StringNodeGameTest() {}
+    public StringNodeGameTest() {}
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void concat(GameTestHelper helper) {
         var g = newGraph();
@@ -73,9 +69,7 @@ public final class StringNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void length(GameTestHelper helper) {
         var g = newGraph();
@@ -92,9 +86,7 @@ public final class StringNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void substring(GameTestHelper helper) {
         var g = newGraph();
@@ -115,9 +107,7 @@ public final class StringNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void indexOf(GameTestHelper helper) {
         var g = newGraph();
@@ -136,9 +126,7 @@ public final class StringNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void replace(GameTestHelper helper) {
         var g = newGraph();
@@ -151,9 +139,7 @@ public final class StringNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void split(GameTestHelper helper) {
         var g = newGraph();
@@ -181,9 +167,7 @@ public final class StringNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void join(GameTestHelper helper) {
         var g = newGraph();
@@ -201,9 +185,7 @@ public final class StringNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void format(GameTestHelper helper) {
         // Format requires UNKNOWN-typed args. Use ListGet trick? Easier: directly use a numeric AddNode.
@@ -228,9 +210,7 @@ public final class StringNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void caseOp(GameTestHelper helper) {
         for (var c : new Object[][]{{CaseNode.Op.LOWER, "Hello World", "hello world"},
@@ -246,9 +226,7 @@ public final class StringNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void trim(GameTestHelper helper) {
         var g = newGraph();
@@ -259,9 +237,7 @@ public final class StringNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void contains(GameTestHelper helper) {
         var g = newGraph();
@@ -280,9 +256,7 @@ public final class StringNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void startsWith(GameTestHelper helper) {
         var g = newGraph();
@@ -301,9 +275,7 @@ public final class StringNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void endsWith(GameTestHelper helper) {
         var g = newGraph();
@@ -323,8 +295,7 @@ public final class StringNodeGameTest {
      * <p>The {@code x42} pair is the whole point of the test: if this node ever became "contains a match"
      * both halves would still look reasonable in isolation, and only the pair pins the rule.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void regexMatchesWholeString(GameTestHelper helper) {
         var digits = node(MatchesNode.class, "in", "42", "pattern", "\\d+");
         assertEq(helper, "42 is all digits", Boolean.TRUE, eval(digits, "out", Boolean.class));
@@ -349,8 +320,7 @@ public final class StringNodeGameTest {
      * <p>The input is the shape of {@code /list} output on purpose — turning that line back into two
      * numbers is the reason these nodes exist, and a test on {@code "abc"} would not show it.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void regexFindsAndCaptures(GameTestHelper helper) {
         String line = "There are 3 of a max of 20 players online";
         var hit = node(FindNode.class, "in", line, "pattern", "(\\d+) of a max of (\\d+)");
@@ -384,8 +354,7 @@ public final class StringNodeGameTest {
     }
 
     /** {@code string_replace_regex}, including the two ways the replacement text itself can be wrong. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void regexReplacesWithGroups(GameTestHelper helper) {
         var swap = node(ReplaceRegexNode.class, "in", "x=1, y=2",
                 "pattern", "(\\w+)=(\\w+)", "replacement", "$2=$1");
@@ -417,9 +386,7 @@ public final class StringNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void multiline(GameTestHelper helper) {
         var g = newGraph();

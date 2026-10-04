@@ -15,8 +15,7 @@ import com.mojang.logging.LogUtils;
 import java.util.OptionalLong;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import org.slf4j.Logger;
 
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertEq;
@@ -57,10 +56,9 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertTrue
  * assertion is flaky on a busy machine and vacuous on a fast one. Each shape asserts that it
  * computed the value it is supposed to, so a benchmark cannot get faster by doing less.</p>
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class ExecutorBenchShapesGameTest {
+public final class ExecutorBenchShapesGameTest implements FabricGameTest {
 
-    private ExecutorBenchShapesGameTest() {}
+    public ExecutorBenchShapesGameTest() {}
 
     private static final int CHAIN = 16;
 
@@ -69,8 +67,7 @@ public final class ExecutorBenchShapesGameTest {
     /**
      * Monomorphic versus megamorphic dispatch, everything else held fixed. See the class javadoc.
      */
-    @GameTest(template = "empty", timeoutTicks = 6000)
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty", timeoutTicks = 6000)
     public static void dispatchCost(GameTestHelper helper) {
         var mono = KGGraphFixtures.monomorphicChain(CHAIN);
         var poly = KGGraphFixtures.polymorphicChain(CHAIN);
@@ -118,8 +115,7 @@ public final class ExecutorBenchShapesGameTest {
      * {@code comparePaired} refuses to report a delta whose sign is not stable across repetitions —
      * so this either produces a number that means something or says it could not.</p>
      */
-    @GameTest(template = "empty", timeoutTicks = 6000)
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty", timeoutTicks = 6000)
     public static void optionReadCost(GameTestHelper helper) {
         var b = KGGraphFixtures.optionChain(CHAIN);
         var out = b.outputOf("u" + (CHAIN - 1));
@@ -151,8 +147,7 @@ public final class ExecutorBenchShapesGameTest {
      * Switching {@link GraphExecutor.Opt#EXEC_PRERESOLVE} off puts that lookup back — see its
      * javadoc for why that is a fair reproduction rather than an approximation.</p>
      */
-    @GameTest(template = "empty", timeoutTicks = 6000)
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty", timeoutTicks = 6000)
     public static void execStepLookupCost(GameTestHelper helper) {
         int steps = 32;
         var b = KGGraphFixtures.execChain(steps);
@@ -187,8 +182,7 @@ public final class ExecutorBenchShapesGameTest {
      * the JIT can make of the normal path, and {@code locomotion} is a realistic mixture where it
      * cannot.</p>
      */
-    @GameTest(template = "empty", timeoutTicks = 6000)
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty", timeoutTicks = 6000)
     public static void intrinsicsCost(GameTestHelper helper) {
         // 1. a pure-data chain of one intrinsified class
         var chain = KGGraphFixtures.monomorphicChain(CHAIN);
@@ -237,8 +231,7 @@ public final class ExecutorBenchShapesGameTest {
      * {@code execute} call and the staging round trip per node; {@code FUSED_EXEC_DRIVER} removes one
      * of the two stack settles per node in {@code runToCompletion}.</p>
      */
-    @GameTest(template = "empty", timeoutTicks = 6000)
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty", timeoutTicks = 6000)
     public static void execIntrinsicsCost(GameTestHelper helper) {
         int steps = 32;
         var b = KGGraphFixtures.execChain(steps);
@@ -274,8 +267,7 @@ public final class ExecutorBenchShapesGameTest {
     // ---- cheap shapes ------------------------------------------------------------------------
 
     /** Straight-line exec flow with no data: the per-step cost of the exec VM. */
-    @GameTest(template = "empty", timeoutTicks = 6000)
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty", timeoutTicks = 6000)
     public static void execChain32(GameTestHelper helper) {
         var b = KGGraphFixtures.execChain(32);
         var exec = new GraphExecutor(b.graph());
@@ -291,8 +283,7 @@ public final class ExecutorBenchShapesGameTest {
     }
 
     /** Branch after branch, alternating sides — the bool round trip plus exec dispatch. */
-    @GameTest(template = "empty", timeoutTicks = 6000)
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty", timeoutTicks = 6000)
     public static void branchLadder16(GameTestHelper helper) {
         var b = KGGraphFixtures.branchLadder(CHAIN);
         var exec = new GraphExecutor(b.graph());
@@ -312,8 +303,7 @@ public final class ExecutorBenchShapesGameTest {
     }
 
     /** Sixteen variable read-modify-writes over four variables: the variable store under load. */
-    @GameTest(template = "empty", timeoutTicks = 6000)
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty", timeoutTicks = 6000)
     public static void varPingPong16(GameTestHelper helper) {
         var b = KGGraphFixtures.variablePingPong(CHAIN);
         var store = new VariableStore();
@@ -333,8 +323,7 @@ public final class ExecutorBenchShapesGameTest {
     }
 
     /** One 32-input {@code Add}: how port width scales, and the judge for the indexed-port question. */
-    @GameTest(template = "empty", timeoutTicks = 6000)
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty", timeoutTicks = 6000)
     public static void wideAdd32(GameTestHelper helper) {
         int width = 32;
         var b = KGGraphBuilder.blueprint();
@@ -377,8 +366,7 @@ public final class ExecutorBenchShapesGameTest {
      * per-call child executors — <em>escapes</em> into something long-lived and cannot be scalar
      * replaced, which is why those figures held to the byte across dozens of runs.</p>
      */
-    @GameTest(template = "empty", timeoutTicks = 6000)
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty", timeoutTicks = 6000)
     public static void vectorChain16(GameTestHelper helper) {
         var b = KGGraphBuilder.blueprint();
         b.add("base", VectorNodes.Make.class)
@@ -409,8 +397,7 @@ public final class ExecutorBenchShapesGameTest {
     // ---- expensive shapes --------------------------------------------------------------------
 
     /** Loop iteration cost: 1024 iterations of a two-node body carrying an accumulator. */
-    @GameTest(template = "empty", timeoutTicks = 6000)
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty", timeoutTicks = 6000)
     public static void forLoop1024(GameTestHelper helper) {
         int n = 1024;
         var b = KGGraphFixtures.accumulatingLoop(n);
@@ -432,8 +419,7 @@ public final class ExecutorBenchShapesGameTest {
     }
 
     /** Subgraph call cost — expected to be the worst number in the suite. */
-    @GameTest(template = "empty", timeoutTicks = 6000)
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty", timeoutTicks = 6000)
     public static void subgraphCalls(GameTestHelper helper) {
         for (int calls : new int[]{1, 16}) {
             var b = KGGraphFixtures.subgraphCalls(calls);
@@ -461,8 +447,7 @@ public final class ExecutorBenchShapesGameTest {
      * The mixed workload — the same graph {@code MixedWorkloadGameTest} asserts the values of, so
      * the shape being measured is a shape something proves is still correct.
      */
-    @GameTest(template = "empty", timeoutTicks = 6000)
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty", timeoutTicks = 6000)
     public static void mixedWorkload(GameTestHelper helper) {
         var b = KGGraphFixtures.mixedWorkload();
         var exec = new GraphExecutor(b.graph());
@@ -518,8 +503,7 @@ public final class ExecutorBenchShapesGameTest {
      * is asserted, because if the off side computed something different the comparison would be
      * timing two different amounts of work rather than the check.
      */
-    @GameTest(template = "empty", timeoutTicks = 6000)
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty", timeoutTicks = 6000)
     public static void numericPromotionCost(GameTestHelper helper) {
         laneCost(helper, "add-chain-16 (1 wire + 1 constant)",
                 KGGraphFixtures.chainOfAdds(CHAIN), "n" + (CHAIN - 1), CHAIN);

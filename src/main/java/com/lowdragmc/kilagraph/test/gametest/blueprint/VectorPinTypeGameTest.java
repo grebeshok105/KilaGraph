@@ -19,8 +19,7 @@ import com.lowdragmc.lowdraglib2.nodegraphtookit.model.node.PortModel;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -45,8 +44,7 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
  * truncated". Nothing in the arithmetic notices if a node is given the wrong one of those, so the
  * split is only real if it is asserted.
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class VectorPinTypeGameTest {
+public final class VectorPinTypeGameTest implements FabricGameTest {
 
     private static final float EPS = 1e-4f;
 
@@ -76,7 +74,7 @@ public final class VectorPinTypeGameTest {
             VectorGeometryNodes.RotateAxis.class, VectorGeometryNodes.FromRotation.class,
             VectorGeometryNodes.ToRotation.class);
 
-    private VectorPinTypeGameTest() {
+    public VectorPinTypeGameTest() {
     }
 
     /**
@@ -86,8 +84,7 @@ public final class VectorPinTypeGameTest {
      * apart — the arithmetic reads {@code components()} either way — so a node that drifted onto the
      * wrong handle would keep working while its pin colour told the author the opposite of the truth.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void polymorphicPinsSayVectorAndThreeDimensionalOnesSayVec3(GameTestHelper helper) {
         var failures = new ArrayList<String>();
         for (Class<? extends Node> cls : POLYMORPHIC) {
@@ -121,8 +118,7 @@ public final class VectorPinTypeGameTest {
      * and its output type is the only thing that says which. Putting VECTOR on them would throw that
      * away and leave three nodes whose only difference was invisible.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void theMakeNodesAdvertiseTheExactWidthTheyProduce(GameTestHelper helper) {
         assertEq(helper, "vector_make out", KGTypeHandles.VEC3, outputHandle(VectorNodes.Make.class));
         assertEq(helper, "vector_make2 out", KGTypeHandles.VEC2, outputHandle(VectorNodes.Make2.class));
@@ -130,8 +126,7 @@ public final class VectorPinTypeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void theWidthConversionsTakeAnyWidthAndNameTheOneTheyProduce(GameTestHelper helper) {
         assertConverts(helper, "vector_to_vec2", VectorConvertNodes.ToVec2.class, KGTypeHandles.VEC2);
         assertConverts(helper, "vector_to_vec3", VectorConvertNodes.ToVec3.class, KGTypeHandles.VEC3);
@@ -156,8 +151,7 @@ public final class VectorPinTypeGameTest {
      * come back a Vector3 and a Vector4 would lose its w, silently, and only after a reload. The
      * width picker in the editor would look like it worked right up until you closed the world.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void aVectorConstantKeepsItsWidthAcrossASave(GameTestHelper helper) {
         BlueprintGraph g = newGraph();
         NodeModel node = addRegisteredNode(g, VectorMathNodes.Multiply.class);
@@ -197,8 +191,7 @@ public final class VectorPinTypeGameTest {
      * wrappers — and if they ever stopped agreeing, the symptom would not be a failing evaluation
      * but a wire the editor silently refuses to draw.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void scalarPinsKeepTheOrdinaryScalarHandles(GameTestHelper helper) {
         assertEq(helper, "vector_length out", TypeHandles.FLOAT, outputHandle(VectorNodes.Length.class));
         assertEq(helper, "vector_dot out", TypeHandles.FLOAT, outputHandle(VectorNodes.Dot.class));
@@ -226,8 +219,7 @@ public final class VectorPinTypeGameTest {
     }
 
     /** Any width reaches a VECTOR pin, which is the whole promise the handle makes. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void everyWidthReachesAVectorPin(GameTestHelper helper) {
         assertReaches(helper, "Vector2", VectorNodes.Make2.class);
         assertReaches(helper, "Vector3", VectorNodes.Make.class);
@@ -246,8 +238,7 @@ public final class VectorPinTypeGameTest {
     }
 
     /** A fresh VECTOR pin starts at a usable width-3 value rather than null. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void aFreshVectorPinDefaultsToWidthThree(GameTestHelper helper) {
         BlueprintGraph g = newGraph();
         NodeModel node = addNode(g, VectorMathNodes.Multiply.class);

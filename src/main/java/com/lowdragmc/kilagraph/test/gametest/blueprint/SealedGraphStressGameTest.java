@@ -11,8 +11,7 @@ import com.lowdragmc.kilagraph.test.gametest.KGGraphFixtures;
 import com.mojang.logging.LogUtils;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
@@ -50,10 +49,9 @@ import java.util.function.Supplier;
  * <p>Every executor gets the <em>same seed</em>, so a graph containing {@code Random} still has one
  * right answer and the comparison stays exact rather than approximate.</p>
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class SealedGraphStressGameTest {
+public final class SealedGraphStressGameTest implements FabricGameTest {
 
-    private SealedGraphStressGameTest() {}
+    public SealedGraphStressGameTest() {}
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
@@ -105,8 +103,7 @@ public final class SealedGraphStressGameTest {
                 new Shape("mixed-workload", KGGraphFixtures::mixedWorkload, null, true));
     }
 
-    @GameTest(template = "empty", timeoutTicks = 6000)
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty", timeoutTicks = 6000)
     public static void everyShapeAgreesUnderConcurrency(GameTestHelper helper) throws Exception {
         List<Shape> shapes = shapes();
         for (Shape shape : shapes) {
@@ -241,8 +238,7 @@ public final class SealedGraphStressGameTest {
      * would mean something on the shared path is serialising and the whole exercise is pointless;
      * producing that finding is the reason this exists, not the timing.</p>
      */
-    @GameTest(template = "empty", timeoutTicks = 6000)
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty", timeoutTicks = 6000)
     public static void concurrentExecutionActuallyScales(GameTestHelper helper) throws Exception {
         var b = KGGraphFixtures.mixedWorkload();
         int total = THREADS * SCALE_ITERATIONS;
@@ -341,8 +337,7 @@ public final class SealedGraphStressGameTest {
      * walks {@code inputSourceOwners} directly and never asks for a node by model. If this ever comes
      * back non-trivial, that assumption has stopped being true.</p>
      */
-    @GameTest(template = "empty", timeoutTicks = 6000)
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty", timeoutTicks = 6000)
     public static void sealingCostsNothingMeasurable(GameTestHelper helper) {
         var sealedGraph = KGGraphFixtures.mixedWorkload();
         var plainGraph = KGGraphFixtures.mixedWorkload();

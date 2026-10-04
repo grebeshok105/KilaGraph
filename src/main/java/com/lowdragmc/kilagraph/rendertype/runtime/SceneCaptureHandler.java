@@ -1,29 +1,24 @@
 package com.lowdragmc.kilagraph.rendertype.runtime;
 
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
-import net.neoforged.neoforge.common.NeoForge;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 
 /**
  * Client hook that drives {@link SceneCaptureManager#capture()} at the opaque&rarr;translucent boundary.
  *
- * <p>Listens for {@link RenderLevelStageEvent} and, on {@link RenderLevelStageEvent.Stage#AFTER_BLOCK_ENTITIES}
- * (opaque terrain + entities + block entities drawn, before translucent), captures the scene colour/depth when
- * any material needs it ({@link SceneCaptureManager#isNeeded()}). 1.21.1 exposes the per-stage boundary via
- * {@code getStage()} (the 26.1 {@code RenderLevelStageEvent.AfterOpaqueFeatures} nested event does not exist).</p>
+ * <p>Listens for {@link WorldRenderEvents#AFTER_ENTITIES}: the closest fabric hook to neoforge's
+ * {@code RenderLevelStageEvent.Stage#AFTER_BLOCK_ENTITIES} — vanilla draws block entities in the same
+ * pass as entities, and translucent comes later, so the opaque scene is fully on screen here.</p>
  */
 public final class SceneCaptureHandler {
 
     private SceneCaptureHandler() {}
 
-    /** Register the capture listener on the game event bus (client only). */
+    /** Register the capture listener (client only). */
     public static void init() {
-        NeoForge.EVENT_BUS.addListener(SceneCaptureHandler::onRenderLevelStage);
-    }
-
-    private static void onRenderLevelStage(RenderLevelStageEvent event) {
-        if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_BLOCK_ENTITIES
-                && SceneCaptureManager.INSTANCE.isNeeded()) {
-            SceneCaptureManager.INSTANCE.capture();
-        }
+        WorldRenderEvents.AFTER_ENTITIES.register(context -> {
+            if (SceneCaptureManager.INSTANCE.isNeeded()) {
+                SceneCaptureManager.INSTANCE.capture();
+            }
+        });
     }
 }

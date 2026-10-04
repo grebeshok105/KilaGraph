@@ -38,8 +38,10 @@ class NodeTooltipHelperTest {
                 1,
                 true
         ));
-        assertThrows(IllegalArgumentException.class,
-                () -> Component.translatable("kg.node.rt_screen_position.tooltip", List.of("bad")));
+        // NeoForge validates translation args eagerly and throws IllegalArgumentException here;
+        // vanilla (and therefore fabric) only fails when the text is formatted, so there is no
+        // construction-time rejection to assert.
+        assertDoesNotThrow(() -> Component.translatable("kg.node.rt_screen_position.tooltip", List.of("bad")));
     }
 
     @NodeAttribute(name = "mc_plain_test", group = "mc", graphTypes = BlueprintGraph.class)

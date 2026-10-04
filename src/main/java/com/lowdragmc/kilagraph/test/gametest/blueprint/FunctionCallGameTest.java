@@ -15,8 +15,7 @@ import com.lowdragmc.kilagraph.test.gametest.KGGraphBuilder;
 import com.lowdragmc.lowdraglib2.nodegraphtookit.api.variable.VariableKind;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertEq;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertTrue;
@@ -36,14 +35,12 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertTrue
  * variable store, and a {@code uid.toString()} per parameter per call), so they are also the shapes
  * that must keep working when that path is optimised.</p>
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class FunctionCallGameTest {
+public final class FunctionCallGameTest implements FabricGameTest {
 
-    private FunctionCallGameTest() {}
+    public FunctionCallGameTest() {}
 
     /** {@code (a, b) -> (a + b, a - b)}: two parameters in, two return values out, one call. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void multipleParametersAndReturns(GameTestHelper helper) {
         var outer = KGGraphBuilder.blueprint();
         var fn = outer.subgraph();
@@ -69,8 +66,7 @@ public final class FunctionCallGameTest {
      * pooling, and a pool that leaked a variable store or a memo between the two call sites would
      * make both answer the same — which is exactly what this asserts cannot happen.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void twoCallSitesDoNotShareState(GameTestHelper helper) {
         var outer = KGGraphBuilder.blueprint();
         var fn = outer.subgraph();
@@ -96,8 +92,7 @@ public final class FunctionCallGameTest {
      * Three levels of nesting, each adding one to the value threaded through it, so a level that
      * silently failed to run changes the answer instead of being invisible.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void threeLevelsDeep(GameTestHelper helper) {
         var outer = KGGraphBuilder.blueprint();
         var lvl1 = outer.subgraph();
@@ -123,8 +118,7 @@ public final class FunctionCallGameTest {
     }
 
     /** A function whose body is a loop: {@code out = sum(0 .. n-1)}. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void functionContainingALoop(GameTestHelper helper) {
         var outer = KGGraphBuilder.blueprint();
         var fn = outer.subgraph();
@@ -164,8 +158,7 @@ public final class FunctionCallGameTest {
     }
 
     /** A loop whose body calls a function: three calls, each doubling the running total. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void loopContainingAFunctionCall(GameTestHelper helper) {
         var outer = KGGraphBuilder.blueprint();
         var fn = outer.subgraph();
@@ -204,8 +197,7 @@ public final class FunctionCallGameTest {
      * asserts this for a name the parent never mentions; this asserts the harder case, where parent
      * and function use the <em>same</em> name and must not see each other's value.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void sameNamedVariablesDoNotCollide(GameTestHelper helper) {
         var outer = KGGraphBuilder.blueprint();
         var fn = outer.subgraph();
@@ -248,8 +240,7 @@ public final class FunctionCallGameTest {
      *
      * <p>Two calls with different arguments, summed: leaking the memo gives 2 instead of 3.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void aCacheInsideAFunctionDoesNotLeakBetweenCalls(GameTestHelper helper) {
         var outer = KGGraphBuilder.blueprint();
         var fn = outer.subgraph();
@@ -295,8 +286,7 @@ public final class FunctionCallGameTest {
      *
      * <p>Asserted as {@code sum == 2 × last}, which holds exactly when the two draws are equal.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void aSeededFunctionRestartsItsRandomSequencePerCall(GameTestHelper helper) {
         var outer = KGGraphBuilder.blueprint();
         var fn = outer.subgraph();

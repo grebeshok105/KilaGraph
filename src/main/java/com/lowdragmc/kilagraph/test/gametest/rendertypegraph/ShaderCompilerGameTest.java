@@ -139,8 +139,7 @@ import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
@@ -162,10 +161,9 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
  * <p>GPU-validity (driver compilation) is not asserted here — that is verified at runtime via
  * {@code GpuDevice.precompilePipeline} (requires a client). These tests pin the generated source.</p>
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class ShaderCompilerGameTest {
+public final class ShaderCompilerGameTest implements FabricGameTest {
 
-    private ShaderCompilerGameTest() {}
+    public ShaderCompilerGameTest() {}
 
     private static CompiledShaderGraph compile(RenderTypeGraph graph) {
         return new ShaderGraphCompiler(graph).compile();
@@ -188,8 +186,7 @@ public final class ShaderCompilerGameTest {
 
     /** A Branch node emits a ternary {@code (pred ? t : f)} select; the result width follows the wider
      *  operand (a vec3 {@code t} broadcasts the scalar {@code f} to vec3). The wired Compare emits its op. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void branchEmitsSelect(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel emission = addBlock(graph, graph.getFragmentStageModel(), FragmentEmissionBlock.class);
@@ -209,8 +206,7 @@ public final class ShaderCompilerGameTest {
     }
 
     /** Compare emits the chosen relational operator (→ bool); And/Or/Not emit {@code &&}/{@code ||}/{@code !}. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void compareLogicEmitGlsl(GameTestHelper helper) {
         String[][] ops = {{"equal", "=="}, {"notEqual", "!="}, {"less", "<"},
                 {"lessEqual", "<="}, {"greater", ">"}, {"greaterEqual", ">="}};
@@ -240,8 +236,7 @@ public final class ShaderCompilerGameTest {
 
     /** The Expression node defines its ports from the spec and compiles to a per-instance helper function
      *  ({@code void kg_expr_…(in …, out …)}) called with the input expressions + declared out temps. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void expressionNodeEmitsFunctionAndCall(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel emission = addBlock(graph, graph.getFragmentStageModel(), FragmentEmissionBlock.class);
@@ -268,8 +263,7 @@ public final class ShaderCompilerGameTest {
     /** {@link ExportShaderFunction#build} turns a selection into a standalone ShaderFunctionGraph with one
      *  READ (incoming) + one WRITE (outgoing) boundary variable and the copied nodes — without modifying the
      *  source graph. (The editor menu + resource persistence is client-verified.) */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void exportBuildsFunctionGraph(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel vecA = addRegisteredNode(graph, Vec3Node.class);
@@ -313,8 +307,7 @@ public final class ShaderCompilerGameTest {
 
     /** The Expression node reports a validation error for a reserved/illegal port name (so the editor's
      *  GraphLogger surfaces it next to the node), and none for a valid spec. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void expressionNodeValidationFlagsBadNames(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel exprModel = addNode(graph, ExpressionNode.class);
@@ -337,8 +330,7 @@ public final class ShaderCompilerGameTest {
     /** The fragment-stage built-in keyword nodes emit their GLSL special variables into the fsh with no
      *  stage errors: Front Facing → {@code gl_FrontFacing}, Fragment Coordinate → {@code gl_FragCoord},
      *  Primitive ID → {@code gl_PrimitiveID}. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void builtinFragmentKeywordsEmitGlsl(GameTestHelper helper) {
         // Fragment Coordinate (vec4) → emission color.
         RenderTypeGraph coordGraph = new RenderTypeGraph();
@@ -376,8 +368,7 @@ public final class ShaderCompilerGameTest {
     /** The ID nodes are now stage-agnostic ({@code ANY}): the vsh reads {@code gl_VertexID}/{@code gl_InstanceID}
      *  directly, and the fragment stage receives them through an auto-forwarded {@code flat int} varying (int
      *  varyings must be {@code flat}). */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void idNodesWorkInBothStages(GameTestHelper helper) {
         // Fragment stage: Vertex ID → fragment emission. No longer a stage error — it's forwarded as a flat
         // int varying, so the fsh declares `flat in int kg_vertexId` and the vsh writes it from gl_VertexID.
@@ -408,8 +399,7 @@ public final class ShaderCompilerGameTest {
     /** The Position/Normal nodes emit the chosen coordinate space's matrix math and are usable in both stages.
      *  World uses the camera-relative→absolute chain (ModelViewMat, kg_IViewMat, kg_CameraBlockPos); View uses
      *  ModelViewMat; Object reads the interpolated object-space source. None are stage errors. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void positionNormalNodesEmitSpaceGlsl(GameTestHelper helper) {
         // Position, world space: absolute world = un-rotate view→world (kg_IViewMat) + camera world position.
         String posWorld = inputNodeFsh(PositionNode.class, "space", "world");
@@ -440,8 +430,7 @@ public final class ShaderCompilerGameTest {
      * orthonormal basis built from the normal alone in the vertex stage (where derivatives are illegal).
      * Both are then rotated into the chosen space by the same matrices the Normal node uses.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void tangentBasisIsDerivedPerStage(GameTestHelper helper) {
         // Fragment stage: the uv frame, from screen-space derivatives of the position and the uv.
         RenderTypeGraph fragGraph = new RenderTypeGraph();
@@ -488,8 +477,7 @@ public final class ShaderCompilerGameTest {
      * vertex format is the whole opt-in — no node or graph edit — and the value then travels the normal
      * attribute route: a raw {@code in} in the vsh, an interpolated varying in the fsh.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void realTangentAttributeReplacesTheDerivedBasis(GameTestHelper helper) {
         // Nothing registers one by default — that is the point of reserving the key.
         assertTrue(helper, "no tangent element is registered out of the box",
@@ -531,8 +519,7 @@ public final class ShaderCompilerGameTest {
 
     /** Deriving the basis costs four derivatives, so it is built once per stage: a second reader (Bitangent
      *  alongside Tangent) must reuse the same hoisted temps rather than deriving it again. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void tangentBasisIsSharedWithinAStage(GameTestHelper helper) {
         int onlyTangent = countOccurrences(inputNodeFsh(TangentNode.class, "space", "world"),
                 "kg_tangentFrameFromUv(");
@@ -556,8 +543,7 @@ public final class ShaderCompilerGameTest {
      * space is the constant {@code (0,0,1)} — Unity's behaviour, and the flat value a normal-map chain starts
      * from. Transform's {@code tangent → world} with type {@code normal} is the inverse: it applies the basis.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void tangentSpaceNormalRoundTrip(GameTestHelper helper) {
         assertTrue(helper, "normal in tangent space is the basis' own axis",
                 inputNodeFsh(NormalNode.class, "space", "tangent").contains("vec3(0.0, 0.0, 1.0)"));
@@ -582,8 +568,7 @@ public final class ShaderCompilerGameTest {
      * emit exactly what they emitted before — these are the graphs everyone already has — while World runs
      * the result through the tangent basis so it can be lit without a Transform node wired on the end.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void normalNodesCanOutputWorldSpace(GameTestHelper helper) {
         for (Class<? extends Node> nodeClass : List.of(NormalFromHeightNode.class, NormalFromTextureNode.class)) {
             String tangent = inputNodeFsh(nodeClass, "space", "tangent");
@@ -603,8 +588,7 @@ public final class ShaderCompilerGameTest {
      * Triplanar's Normal type blends three normal-map samples into a world normal off the projection axes —
      * the one normal-mapping path that needs no mesh tangent, so it must NOT pull in the tangent seam.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void triplanarNormalNeedsNoTangentBasis(GameTestHelper helper) {
         String def = inputNodeFsh(TriplanarNode.class, "type", "default");
         assertFalse(helper, "default triplanar does not unpack normals", def.contains("* 2.0 - 1.0"));
@@ -619,8 +603,7 @@ public final class ShaderCompilerGameTest {
 
     /** The parallax nodes are the payoff of tangent-space view direction: both march the uv along it, and
      *  POM's step count is a compile-time constant so the loop can unroll. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void parallaxNodesUseTangentSpaceViewDir(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel emission = addBlock(graph, graph.getFragmentStageModel(), FragmentEmissionBlock.class);
@@ -657,8 +640,7 @@ public final class ShaderCompilerGameTest {
 
     /** The View Direction node is unnormalized by default (its length is the camera distance); the
      *  {@code normalize} option wraps the output in a {@code normalize()} for a unit-length direction. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void viewDirectionNormalizeOption(GameTestHelper helper) {
         assertTrue(helper, "the normalize option adds a normalize() call around the view direction",
                 countOccurrences(viewDirectionFsh(true), "normalize(")
@@ -678,8 +660,7 @@ public final class ShaderCompilerGameTest {
 
     /** The formerly fragment-only UV and Vertex Color nodes are now stage-agnostic: pulled into a vertex
      *  varying block they compile (no stage error) and read their raw vertex attributes in the vsh. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void uvAndVertexColorUsableInVertexStage(GameTestHelper helper) {
         // UV node → vertex varying block (vsh) → consumed in fragment. Previously FRAGMENT_ONLY = a stage error.
         RenderTypeGraph graph = new RenderTypeGraph();
@@ -711,8 +692,7 @@ public final class ShaderCompilerGameTest {
      * and kg_modelPos all read {@code kg_vertexPos}; the lit vertex colour ({@code minecraft_mix_light}), the
      * world-normal varying and the Normal node's object source all read {@code kg_vertexNormal}.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void vertexModelBlocksDisplace(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         // Position block <- Add(Position(object), Vec3): a position-dependent offset.
@@ -755,8 +735,7 @@ public final class ShaderCompilerGameTest {
      * (no displaced temp), and its unconnected fallback is the standard chain. Also: a FRAGMENT_ONLY node
      * wired into a Position block is a stage error (the block pass runs in the vertex scope).
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void vertexModelLegacyGlPosition(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel posBlock = addBlock(graph, graph.getVertexStageModel(), VertexModelPositionBlock.class);
@@ -780,8 +759,7 @@ public final class ShaderCompilerGameTest {
     }
 
     /** A shared upstream node (the texture sample, apply_fog) must be emitted exactly once. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void sharedSubexpressionCompiledOnce(GameTestHelper helper) {
         CompiledShaderGraph compiled = compile(new RenderTypeGraph());
         String fsh = compiled.fragmentSource();
@@ -791,8 +769,7 @@ public final class ShaderCompilerGameTest {
     }
 
     /** An Emission block contributes an additive term to the base color. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void emissionBlockAddsToBaseColor(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel fragment = graph.getFragmentStageModel();
@@ -806,8 +783,7 @@ public final class ShaderCompilerGameTest {
     }
 
     /** An Alpha Discard block emits a clip against the cutoff. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void alphaDiscardEmitsDiscard(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel fragment = graph.getFragmentStageModel();
@@ -820,8 +796,7 @@ public final class ShaderCompilerGameTest {
     }
 
     /** A custom interpolator becomes a vsh {@code out} and a matching fsh {@code in} of the same name. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void customInterpolatorCrossesStages(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel vertex = graph.getVertexStageModel();
@@ -843,8 +818,7 @@ public final class ShaderCompilerGameTest {
     }
 
     /** A float wired into a vec3 input is broadcast via a vec3(...) constructor. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void floatBroadcastsToVec3(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel fragment = graph.getFragmentStageModel();
@@ -858,8 +832,7 @@ public final class ShaderCompilerGameTest {
     }
 
     /** A vec4 wired into a vec3 input is narrowed via a .xyz swizzle (default graph already does this). */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void vec4SwizzlesToVec3(GameTestHelper helper) {
         // The default entity graph feeds a vec3 base color built from split floats; instead, wire a
         // vec4 (apply_fog output via a fresh sample) straight into a vec3 base-color block.
@@ -875,8 +848,7 @@ public final class ShaderCompilerGameTest {
     }
 
     /** Sampler-typed values are never copied into a temp (illegal in GLSL). */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void samplerIsNotHoisted(GameTestHelper helper) {
         CompiledShaderGraph compiled = compile(new RenderTypeGraph());
         String fsh = compiled.fragmentSource();
@@ -888,8 +860,7 @@ public final class ShaderCompilerGameTest {
     }
 
     /** An unconnected sampler input falls back to a dedicated {@code kg_MissingSampler} (MC missing-texture). */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void unconnectedSamplerFallsBackToMissing(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel fragment = graph.getFragmentStageModel();
@@ -909,8 +880,7 @@ public final class ShaderCompilerGameTest {
      * {@code uniform sampler2D kg_tex_*} (never a literal) whose baked {@link SamplerDefault} carries the
      * configured texture + sampler params (filter / address / mipmap).
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void textureNodeBecomesUniform(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel fragment = graph.getFragmentStageModel();
@@ -939,8 +909,7 @@ public final class ShaderCompilerGameTest {
     }
 
     /** Overlay/LightMap nodes emit Sampler1/Sampler2 and flag the pipeline (replacing Settings toggles). */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void overlayLightmapNodesFlagPipeline(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel fragment = graph.getFragmentStageModel();
@@ -967,8 +936,7 @@ public final class ShaderCompilerGameTest {
     }
 
     /** The expanded {@link RenderTypeGraphTypes.Sampler2DValue} round-trips through its codec (so it persists). */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void sampler2DValueCodecRoundTrips(GameTestHelper helper) {
         var value = new RenderTypeGraphTypes.Sampler2DValue("minecraft:textures/block/dirt.png",
                 RenderTypeGraphTypes.SamplerMode.ATLAS, RenderTypeGraphTypes.SamplerFilter.LINEAR,
@@ -986,8 +954,7 @@ public final class ShaderCompilerGameTest {
      * sampler present in the shader's sampler-name list resolves to its unit (= its index, per
      * {@code ShaderInstance.apply}) with the mapped GL min/mag filter + wrap; one absent from that list is skipped.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void samplerParamsResolveToGlBindings(GameTestHelper helper) {
         var loc = ResourceLocation.withDefaultNamespace("dummy");
         List<String> samplerNames = List.of("Sampler0", "kg_tex_a", "Sampler2", "kg_tex_b");
@@ -1026,8 +993,7 @@ public final class ShaderCompilerGameTest {
      * helper are declared (the struct before {@code main()}), a per-gradient builder is baked with the keys
      * (Fixed mode → {@code header.x == 1}), and the fragment samples it. GRADIENT is opaque (no temp copy).
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void gradientNodesEmitGlsl(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel fragment = graph.getFragmentStageModel();
@@ -1056,8 +1022,7 @@ public final class ShaderCompilerGameTest {
      * struct declared <b>before</b> the UBO block (it references the type) — and its default gradient is
      * std140-packed (header + 8 colour + 8 alpha vec4 = 68 floats) into {@code uniformDefaults}.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void gradientVariableBecomesUboStruct(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel fragment = graph.getFragmentStageModel();
@@ -1091,8 +1056,7 @@ public final class ShaderCompilerGameTest {
     }
 
     /** A {@link RenderTypeGraphTypes.GradientValue} round-trips through its codec (so a gradient persists). */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void gradientValueCodecRoundTrips(GameTestHelper helper) {
         var value = new RenderTypeGraphTypes.GradientValue(
                 new GradientColor(0xFF112233, 0xFF445566, 0xFF778899), RenderTypeGraphTypes.BlendMode.FIXED);
@@ -1108,8 +1072,7 @@ public final class ShaderCompilerGameTest {
      * {@code KG_Curve} struct + {@code kg_sampleCurve} helper are declared (struct before {@code main()}),
      * a per-curve builder is baked with the segments, and the fragment samples it (opaque — no temp copy).
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void curveNodesEmitGlsl(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel fragment = graph.getFragmentStageModel();
@@ -1138,8 +1101,7 @@ public final class ShaderCompilerGameTest {
      * (header + 16 segment vec4 = 68 floats), set-by-name mapping recorded, and the manifest declares
      * every struct member (else ShaderInstance creates no Uniform and the curve stays zero at runtime).
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void curveVariableBecomesUniformStruct(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel fragment = graph.getFragmentStageModel();
@@ -1172,8 +1134,7 @@ public final class ShaderCompilerGameTest {
 
     /** A {@link RenderTypeGraphTypes.CurveValue} round-trips through its codec, and its CPU evaluation
      *  holds first/last y outside the key range (the same contract the GLSL sampler implements). */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void curveValueCodecRoundTrips(GameTestHelper helper) {
         var segments = new ArrayList<ExplicitCubicBezierCurve2>();
         segments.add(new ExplicitCubicBezierCurve2(
@@ -1197,8 +1158,7 @@ public final class ShaderCompilerGameTest {
      * resolve the portal (entry↔exit), not stop at the portal node. Without the fix the consumer would
      * read 0 (the portal node isn't a ShaderNode).
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void wirePortalRoutesConnection(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel fragment = graph.getFragmentStageModel();
@@ -1219,8 +1179,7 @@ public final class ShaderCompilerGameTest {
     }
 
     /** A Time node pulls from the engine-globals block (KG_Globals.Time), updated by us each frame. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void timeNodeUsesEngineGlobals(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel fragment = graph.getFragmentStageModel();
@@ -1243,8 +1202,7 @@ public final class ShaderCompilerGameTest {
      * compilePreview emits a flat-quad preview shader for an arbitrary output port: mesh uv becomes
      * the quad's {@code vUv}, the subgraph is folded in, and the port value drives {@code fragColor}.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void previewCompilesPortSubgraph(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel uv = addNode(graph, UVNode.class);
@@ -1280,8 +1238,7 @@ public final class ShaderCompilerGameTest {
      * A VERTEX_ONLY node (Normal) pulled into the fragment stage is flagged as a stage error; the same
      * node feeding a vertex varying block is fine.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void stageAffinityFlagsMisuse(GameTestHelper helper) {
         // Misuse: Normal -> fragment base color (fragment stage) → error.
         RenderTypeGraph bad = new RenderTypeGraph();
@@ -1316,8 +1273,7 @@ public final class ShaderCompilerGameTest {
      * uniform field (with its declared default baked into {@code uniformDefaults}); a LOCAL one is
      * inlined as a literal (no uniform field).
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void variableScopeDrivesUniformVsInline(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel fragment = graph.getFragmentStageModel();
@@ -1358,8 +1314,7 @@ public final class ShaderCompilerGameTest {
     }
 
     /** A Sampler2D variable is ALWAYS a uniform sampler (opaque type), regardless of scope. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void samplerVariableBecomesUniform(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel fragment = graph.getFragmentStageModel();
@@ -1390,8 +1345,7 @@ public final class ShaderCompilerGameTest {
      * an ARGB color-picker but compiles to a {@code vec4} (EXPOSED → KG_Material uniform), with the
      * ARGB default unpacked into rgba components.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void colorVariableCompilesToVec4Uniform(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel fragment = graph.getFragmentStageModel();
@@ -1427,8 +1381,7 @@ public final class ShaderCompilerGameTest {
      * callers knowing the mangled {@code kg_*} identifiers. EXPOSED scalar/vec/color vars land in
      * {@code uniformFields} (name + GlslType); Sampler2D vars land in {@code variableSamplers}.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void uniformFieldMappingExposesVariableNames(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel fragment = graph.getFragmentStageModel();
@@ -1488,8 +1441,7 @@ public final class ShaderCompilerGameTest {
      * {@code ctx.litVertexColor()} to vanilla per-vertex diffuse lighting ({@code minecraft_mix_light}),
      * importing {@code minecraft:light.glsl} — the same default the old vertex Color block carried.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void unconnectedVertexColorDefaultsToMixLight(GameTestHelper helper) {
         CompiledShaderGraph compiled = compile(new RenderTypeGraph());
         String vsh = compiled.vertexSource();
@@ -1502,8 +1454,7 @@ public final class ShaderCompilerGameTest {
      * A chain of scalar math nodes (Abs→Sin→Add(+Length)→Min→Lerp→Pow→Clamp→alpha) compiles each to
      * its GLSL builtin / operator. Confirms the unary/binary/ternary node families wire and emit.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void mathNodesEmitGlslCalls(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel fragment = graph.getFragmentStageModel();
@@ -1539,8 +1490,7 @@ public final class ShaderCompilerGameTest {
      * vec3 produces a {@code vec3} result (the float is broadcast), while two floats keep a {@code float}
      * result. Confirms the compile-time width inference + single-evaluation hoist.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void dynamicMathInfersWidth(GameTestHelper helper) {
         // float (Sin output) × vec3 (Vec3 node) -> the Multiply result is hoisted as a vec3 temp.
         RenderTypeGraph graph = new RenderTypeGraph();
@@ -1567,8 +1517,7 @@ public final class ShaderCompilerGameTest {
     }
 
     /** Construct→Transform→Split of a mat4 emits {@code mat4(}, a {@code m * v} transform, and column reads. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void matrixNodesEmitGlsl(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel fragment = graph.getFragmentStageModel();
@@ -1592,8 +1541,7 @@ public final class ShaderCompilerGameTest {
     }
 
     /** A derivative node compiles to its GLSL builtin and, in the fragment stage, raises no stage error. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void derivativeNodesEmitGlsl(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel fragment = graph.getFragmentStageModel();
@@ -1614,8 +1562,7 @@ public final class ShaderCompilerGameTest {
      * error (a preview is a single fragment quad), and the attribute resolves to a fragment-safe default
      * — so the thumbnail compiles instead of going blank. Regression for the preview-recompile bug.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void previewOfVertexAttributeHasNoStageError(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel attr = addNode(graph, VertexAttributeInputNode.class); // default element: position (VERTEX_ONLY)
@@ -1631,8 +1578,7 @@ public final class ShaderCompilerGameTest {
     }
 
     /** The newly added Unity math nodes (Posterize/Sphere Mask/wave/Rejection) emit their GLSL formulas. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void extraMathNodesEmitGlsl(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel fragment = graph.getFragmentStageModel();
@@ -1659,8 +1605,7 @@ public final class ShaderCompilerGameTest {
      * and references the world-space matrices (ModelViewMat in the vsh path, ViewMat/CameraPos from our
      * block) — confirming the precomputed-matrix UBO is wired end to end.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void transformNodeUsesSpaceMatrices(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel fragment = graph.getFragmentStageModel();
@@ -1725,8 +1670,7 @@ public final class ShaderCompilerGameTest {
      * the override — the whole mechanism, without needing the downstream pipeline (Photon) that motivated
      * it. The stock half doubles as the guarantee that the default is still exactly {@code ModelViewMat}.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void transformObjectEndpointFollowsTheSeam(GameTestHelper helper) {
         // Stock compiler: object->world still resolves through ModelViewMat, exactly as before.
         String stock = transformFsh(STOCK, "object", "world", "position");
@@ -1758,8 +1702,7 @@ public final class ShaderCompilerGameTest {
      * then not perpendicular to the transformed surface. The inverse-transpose of one seam is the transpose of
      * the other, so this costs a {@code transpose} and no {@code inverse()}.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void transformNormalUsesInverseTranspose(GameTestHelper helper) {
         String normal = transformFsh(SEAMED, "object", "world", "normal");
         assertTrue(helper, "object->view for a normal transposes the INVERSE seam (fsh=" + normal + ")",
@@ -1816,8 +1759,7 @@ public final class ShaderCompilerGameTest {
     }
 
     /** The merged Exponential/Log nodes pick their GLSL variant from a {@code base} option dropdown. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void expLogBaseOptionDrivesGlsl(GameTestHelper helper) {
         // Default Exponential = exp; switching base to 2 = exp2.
         assertTrue(helper, "default exp emits exp(", expFsh(null).contains("exp("));
@@ -1854,8 +1796,7 @@ public final class ShaderCompilerGameTest {
      * VERTEX_ONLY but crosses to fragment via the varying) and reflects the world matrices, so a client
      * launch isn't wasted on a broken graph.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void worldGridTransformGraphCompiles(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel vertexStage = graph.getVertexStageModel();
@@ -1886,8 +1827,7 @@ public final class ShaderCompilerGameTest {
      * screen-space derivatives ({@code dFdx}). A per-node preview of a fragment-only shape also compiles
      * (its helper-less {@code fwidth} field) and a noise preview carries its helper function.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void proceduralNodesEmitGlsl(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel fragment = graph.getFragmentStageModel();
@@ -1975,8 +1915,7 @@ public final class ShaderCompilerGameTest {
      * Also checks the shared HSV helper is name-deduped (Hue + Colorspace both register {@code kg_rgb2hsv}
      * → one definition) and that the Blend mode dropdown drives the emitted formula.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void artisticNodesEmitGlsl(GameTestHelper helper) {
         String pkg = "com.lowdragmc.kilagraph.rendertype.nodes.artistic.";
         RenderTypeGraph graph = new RenderTypeGraph();
@@ -2058,8 +1997,7 @@ public final class ShaderCompilerGameTest {
     }
 
     /** The Camera node reads the Globals block (camera world position + screen size). */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void cameraNodeReadsGlobals(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel fragment = graph.getFragmentStageModel();
@@ -2086,8 +2024,7 @@ public final class ShaderCompilerGameTest {
     }
 
     /** The KG_Transforms UBO node exposes our precomputed space matrices (flags + declares the block). */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void kgTransformsUboNodeExposesMatrices(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel ubo = addNode(graph, KGTransformsUboNode.class);
@@ -2107,8 +2044,7 @@ public final class ShaderCompilerGameTest {
     }
 
     /** Vector construct (Vec2/Vec4) and vec3 ops (Cross/Normalize/Dot) compile to their GLSL builtins. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void vectorNodesEmitGlslCalls(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel fragment = graph.getFragmentStageModel();
@@ -2148,8 +2084,7 @@ public final class ShaderCompilerGameTest {
      * (object→world via ModelViewMat + kg_IViewMat), the fsh reads them, and the graph registers
      * the KG_Transforms block.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void fresnelDefaultsToMeshNormalAndViewDir(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel fresnel = addNode(graph, FresnelNode.class); // normal/viewDir intentionally unconnected
@@ -2185,8 +2120,7 @@ public final class ShaderCompilerGameTest {
      * Fog distance nodes are VERTEX_ONLY: pulling one into a fragment block is a stage error, but feeding a
      * vsh varying block works and an unconnected {@code pos} defaults to the model-space vertex position.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void fogDistanceNodesAreVertexOnly(GameTestHelper helper) {
         // (a) into a fragment block → stage error keyed to the fog node.
         RenderTypeGraph badGraph = new RenderTypeGraph();
@@ -2214,8 +2148,7 @@ public final class ShaderCompilerGameTest {
      * ApplyFog / TotalFogValue parameters left unconnected fall back to the Fog UBO fields + the fog-distance
      * varyings, so the node fogs with the current scene settings out of the box.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void fogParamsDefaultToUboAndVaryings(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel emission = addBlock(graph, graph.getFragmentStageModel(), FragmentEmissionBlock.class);
@@ -2246,8 +2179,7 @@ public final class ShaderCompilerGameTest {
 
     /** SphereMask's coords port has no configurator: unconnected it defaults to the interpolated mesh
      *  model-space position (kg_modelPos varying). */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void sphereMaskCoordsDefaultToMeshPosition(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel alpha = addBlock(graph, graph.getFragmentStageModel(), FragmentAlphaBlock.class);
@@ -2265,8 +2197,7 @@ public final class ShaderCompilerGameTest {
      * Channel nodes: Combine assembles R/G/B/A into vectors, Swizzle remaps channels (GLSL swizzle), Flip
      * mirrors selected channels (Unity's {@code (flip*-2+1)*in+flip}), Split breaks a vector into floats.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void channelNodesEmitGlsl(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel fragment = graph.getFragmentStageModel();
@@ -2314,8 +2245,7 @@ public final class ShaderCompilerGameTest {
      * UV nodes: the 6 pure-uv transforms (chained, each unconnected uv auto-resolving to the mesh uv) +
      * Triplanar. Asserts their distinctive GLSL appears and there are no stage errors.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void uvNodesEmitGlsl(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel fragment = graph.getFragmentStageModel();
@@ -2356,8 +2286,7 @@ public final class ShaderCompilerGameTest {
      * {@code uv0} varying from the {@code UV0} attribute; UV1 writes {@code uv1} from {@code vec2(UV1)}; and
      * when the chosen channel's attribute is absent from the format it falls back to UV0.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void uvTypeResolvesChannel(GameTestHelper helper) {
         // Default (UV0): the ENTITY format has UV0 → uv0 = UV0.
         RenderTypeGraph g0 = new RenderTypeGraph();
@@ -2392,8 +2321,7 @@ public final class ShaderCompilerGameTest {
     }
 
     /** The UV channel value round-trips through its codec (registered so it survives graph save). */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void uvChannelValueCodecRoundTrips(GameTestHelper helper) {
         var value = RenderTypeGraphTypes.UvChannel.UV2;
         var encoded = RenderTypeGraphTypes.UV_CODEC.encodeStart(NbtOps.INSTANCE, value).result().orElse(null);
@@ -2408,8 +2336,7 @@ public final class ShaderCompilerGameTest {
      * Asserts the captured-scene samplers + their flags, the gl_FragCoord-derived UV, and that Linear01/Eye
      * reconstruct linear depth via the inverse-projection helper.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void sceneNodesEmitGlsl(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel fragment = graph.getFragmentStageModel();
@@ -2459,8 +2386,7 @@ public final class ShaderCompilerGameTest {
      * The captured scene samplers are declared in the layout but carry <b>no</b> baked default texture (unlike
      * a Sampler2D / the missing-texture fallback) — the runtime binds them live from the capture manager.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void sceneSamplersHaveNoBakedDefault(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel sceneColor = addNode(graph, SceneColorNode.class);
@@ -2474,8 +2400,7 @@ public final class ShaderCompilerGameTest {
     }
 
     /** Each Screen Position mode emits its distinctive GLSL formula. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void screenPositionModesEmitGlsl(GameTestHelper helper) {
         assertTrue(helper, "pixel mode scales the screen uv to pixels", screenPosFsh("pixel").contains("* ScreenSize, 0.0, 0.0)"));
         assertTrue(helper, "center mode remaps to -1..1", screenPosFsh("center").contains("* 2.0 - 1.0"));
@@ -2492,8 +2417,7 @@ public final class ShaderCompilerGameTest {
      * Scene Depth "eye" (kg_eye_depth + IProjMat), so {@code SceneDepth[eye] - raw.w} cancels the camera —
      * a camera-independent depth fade. Regression for the old {@code w=1.0} stub.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void screenPositionRawCarriesFragmentEyeDepth(GameTestHelper helper) {
         String fsh = screenPosFsh("raw");
         assertTrue(helper, "raw reconstructs eye depth from gl_FragCoord.z", fsh.contains("kg_eye_depth(gl_FragCoord.z"));
@@ -2509,8 +2433,7 @@ public final class ShaderCompilerGameTest {
      * coordinates would collapse center/tiled/pixel to a near-constant corner. In-world it keeps
      * gl_FragCoord screen-space.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void screenPositionPreviewMapsToMeshUv(GameTestHelper helper) {
         RenderTypeGraph g = new RenderTypeGraph();
         NodeModel sp = addNode(g, ScreenPositionNode.class); // default mode
@@ -2534,8 +2457,7 @@ public final class ShaderCompilerGameTest {
      * preview colour is {@code vec4(<value>.rgb, 1.0)}, never the {@code vec4(f)} broadcast that aliases
      * alpha to the value.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void scalarPreviewForcesOpaqueAlpha(GameTestHelper helper) {
         RenderTypeGraph g = new RenderTypeGraph();
         NodeModel add = addNode(g, AddNode.class); // scalar (dynamic float) output
@@ -2562,8 +2484,7 @@ public final class ShaderCompilerGameTest {
      * gl_FragCoord screen-space for in-world rendering — so a preview shows the entire scene, not the panel's
      * screen sub-rect.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void scenePreviewMapsWholeCapture(GameTestHelper helper) {
         // Node thumbnail (compilePreview): screen default becomes the quad uv, not gl_FragCoord.
         RenderTypeGraph g = new RenderTypeGraph();
@@ -2588,8 +2509,7 @@ public final class ShaderCompilerGameTest {
     }
 
     /** The extended Camera node exposes Direction (IViewMat), Near/Far (inverse-projection) and Orthographic. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void cameraNodeExposesNewOutputs(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel camera = addNode(graph, CameraNode.class);
@@ -2619,8 +2539,7 @@ public final class ShaderCompilerGameTest {
      * through a varying block by a fixed value previews that fixed value downstream (not the quad uv) — the
      * varying boundary reuses the block's own preview logic.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void uvPreviewSemantics(GameTestHelper helper) {
         // (A) UV node channel previews.
         RenderTypeGraph g0 = new RenderTypeGraph();
@@ -2653,8 +2572,7 @@ public final class ShaderCompilerGameTest {
     }
 
     /** A VertexFormat input (raw vsh attribute) is VERTEX_ONLY: pulling it into fragment is a stage error. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void vertexFormatInputsAreVertexOnly(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel baseColor = addBlock(graph, graph.getFragmentStageModel(), FragmentBaseColorBlock.class);
@@ -2672,8 +2590,7 @@ public final class ShaderCompilerGameTest {
      * A standalone FragmentInput node reads a fixed interpolated varying, ensuring the vsh declares and
      * writes it with the block's default (no vertex block placed). uv0 → UV0; vertexColor → light mix.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void fragmentInputsEmitVaryings(GameTestHelper helper) {
         // TexCoord input → base color: uv0 varying with UV0 default, no kg_uv anywhere.
         RenderTypeGraph uvGraph = new RenderTypeGraph();

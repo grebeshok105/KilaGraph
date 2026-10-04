@@ -61,8 +61,7 @@ import java.util.UUID;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.addBlock;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.addNode;
@@ -72,13 +71,11 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertFals
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertTrue;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
 
-@GameTestHolder(Kilagraph.MODID)
-public final class RenderTypeGraphGameTest {
+public final class RenderTypeGraphGameTest implements FabricGameTest {
 
-    private RenderTypeGraphGameTest() {}
+    public RenderTypeGraphGameTest() {}
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void resourceCreatesGraph(GameTestHelper helper) {
         assertTrue(helper, "RenderTypeGraphResource creates RenderTypeGraph",
                 RenderTypeGraphResource.INSTANCE.createGraph() instanceof RenderTypeGraph);
@@ -90,8 +87,7 @@ public final class RenderTypeGraphGameTest {
      * value edits) bumps {@link RenderTypeGraph#getChangeVersion()}, the signal the live previews gate
      * their per-frame recompile on. Drives the hook directly (no editor) to verify the wiring.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void onGraphChangedBumpsChangeVersion(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         long v0 = graph.getChangeVersion();
@@ -113,8 +109,7 @@ public final class RenderTypeGraphGameTest {
      * duplicated, and {@code compile()} reproduces the original shader byte-for-byte (same content hash,
      * no stage errors) — the condition the persistent preview tool needs to rebuild and draw again.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void undoRoundTripPreservesWholeGraphCompile(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         CompiledShaderGraph before = new ShaderGraphCompiler(graph).compile();
@@ -155,8 +150,7 @@ public final class RenderTypeGraphGameTest {
      * Drives both round-trips directly (no editor UI — see {@code verify-ui-changes-in-client}) since the
      * keys live in the model, not the ephemeral {@code NodeShaderPreview}/{@code ShaderPreviewTool} elements.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void previewShapesPersistAcrossRoundTrip(GameTestHelper helper) {
         String sphere = KGPreviewContents.SPHERE.key();
         String quad = KGPreviewContents.QUAD.key();
@@ -207,8 +201,7 @@ public final class RenderTypeGraphGameTest {
      * A VERTEX_ONLY vertex-attribute node wired into a fragment block is pulled into the fragment stage,
      * which its affinity forbids; once the wire is removed it's no longer flagged.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void stageAffinityViolationFlaggedOnGraphChanged(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel fragment = graph.getFragmentStageModel();
@@ -238,8 +231,7 @@ public final class RenderTypeGraphGameTest {
      * ({@link VaryingStageNode#getSupportBlocks()}) once one is present, so at most one of each can be added;
      * the unlimited custom-varying blocks are never filtered. A detached node reports the full list.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void uniqueVertexBlocksHiddenOncePresent(GameTestHelper helper) {
         // In a real graph the default already holds one Position block, so it's no longer offered — while
         // the still-absent Normal / glPosition and the unlimited Custom varyings still are.
@@ -266,8 +258,7 @@ public final class RenderTypeGraphGameTest {
      * through the editor {@link GraphLogger}, keyed to the offending block); likewise a duplicate
      * single-instance block (e.g. a pasted or loaded second Position) is flagged.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void vertexPositionBlockConflictFlagged(GameTestHelper helper) {
         // The default graph already has a Position block; adding a glPosition makes them mutually exclusive.
         RenderTypeGraph conflictGraph = new RenderTypeGraph();
@@ -289,8 +280,7 @@ public final class RenderTypeGraphGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void supportedTypesIncludeRenderTypeContracts(GameTestHelper helper) {
         List<TypeHandle> types = new RenderTypeGraph().getSupportTypes();
         assertTrue(helper, "supports vec2", types.contains(RenderTypeGraphTypes.VEC2));
@@ -301,8 +291,7 @@ public final class RenderTypeGraphGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void supportedNodesIncludeBuiltins(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         List<Class<? extends Node>> nodes = graph.getSupportNodes();
@@ -347,8 +336,7 @@ public final class RenderTypeGraphGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void graphCarriesRenderTypeSettings(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
 
@@ -369,8 +357,7 @@ public final class RenderTypeGraphGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void stageContextsAcceptExpectedBlocks(GameTestHelper helper) {
         // Query the stage nodes as they exist in a real graph — block discovery is annotation-driven
         // (@UseWithContext) and scans the backing graph model, so a detached `new VaryingStageNode()`
@@ -396,8 +383,7 @@ public final class RenderTypeGraphGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void stageNodesExposePipelinePorts(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel vertex = graph.getVertexStageModel();
@@ -430,8 +416,7 @@ public final class RenderTypeGraphGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void fixedStageModelsCannotBeDeleted(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel vertex = graph.getVertexStageModel();
@@ -449,8 +434,7 @@ public final class RenderTypeGraphGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void resourcePersistsRenderTypeSettings(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         RenderTypeGraph.Settings settings = new RenderTypeGraph.Settings(
@@ -478,8 +462,7 @@ public final class RenderTypeGraphGameTest {
     // the dedicated `runGameTestServer` dist. It exercised GUI behavior, not the compiler; settings serialization
     // is already covered by the resource round-trip test above.
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void newGraphContainsDefaultEntityShader(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel fragment = graph.getFragmentStageModel();
@@ -538,8 +521,7 @@ public final class RenderTypeGraphGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void shaderVectorValuesAreWireCompatible(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         NodeModel split = addNode(graph, SplitNode.class);
@@ -557,8 +539,7 @@ public final class RenderTypeGraphGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void compileDefaultEntityShader(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         CompiledShaderGraph compiled = new ShaderGraphCompiler(graph).compile();
@@ -599,8 +580,7 @@ public final class RenderTypeGraphGameTest {
 
     /** The composed vertex format drives the generated {@code in} attribute declarations: a Block-preset
      * graph declares exactly Position/Color/UV0/UV2/Normal (the stock BLOCK layout) and omits UV1. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void compileRespectsComposedVertexFormat(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         var s = graph.getSettings();
@@ -620,8 +600,7 @@ public final class RenderTypeGraphGameTest {
 
     /** A VertexAttributeInputNode whose chosen element is absent from the composed format is flagged via the
      * GraphLogger (keyed by the node), and not flagged once the element is present. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void vertexFormatValidationFlagsMissingElement(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         // Non-orphan so it appears in getNodeModels(), which the validation iterates (orphan nodes don't).
@@ -651,8 +630,7 @@ public final class RenderTypeGraphGameTest {
     /** Removing a vertex element a node DEFAULT references (the vertex Color block defaults to
      * minecraft_mix_light(Normal, Color)) degrades to a safe constant — the shader stays valid (no Color
      * attribute / undefined var), the substitution is recorded, and onGraphChanged logs a warning. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void vertexElementDefaultFallsBackAndWarns(GameTestHelper helper) {
         RenderTypeGraph graph = new RenderTypeGraph();
         RenderTypeGraph.Settings s = graph.getSettings();
@@ -675,8 +653,7 @@ public final class RenderTypeGraphGameTest {
     }
 
     /** The built-in preview contents build the expected neutral geometry. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void previewContentsBuildGeometry(GameTestHelper helper) {
         var quad = new PreviewMeshBuilder();
         KGPreviewContents.QUAD.build(quad);
@@ -704,8 +681,7 @@ public final class RenderTypeGraphGameTest {
 
     /** The tessellator emits the right vertex count per primitive mode, and the triangle-strip stitch
      * preserves winding (every reconstructed triangle stays CCW). */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void previewTessellatorMatchesMode(GameTestHelper helper) {
         var mb = new PreviewMeshBuilder();
         KGPreviewContents.CUBE.build(mb); // 6 quads, 24 edges

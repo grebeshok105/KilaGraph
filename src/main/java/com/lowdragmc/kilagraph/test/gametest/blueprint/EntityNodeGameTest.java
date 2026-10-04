@@ -1,8 +1,7 @@
 package com.lowdragmc.kilagraph.test.gametest.blueprint;
 
 
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
-import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.gametest.framework.GameTest;
 import com.lowdragmc.kilagraph.Kilagraph;
 import com.lowdragmc.kilagraph.blueprint.BlueprintGraph;
@@ -34,22 +33,19 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
  * Entity-query nodes against a live {@link ServerLevel}: find entities in a radius / box, and
  * distance between two entities. Level and entities reach the nodes via seeded wire-only variables.
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class EntityNodeGameTest {
+public final class EntityNodeGameTest implements FabricGameTest {
     private static final String IN_RADIUS = "mc_entity_in_radius";
     private static final String IN_AABB = "mc_entity_in_aabb";
     private static final String DISTANCE = "mc_entity_distance_test";
 
-    private EntityNodeGameTest() {}
+    public EntityNodeGameTest() {}
 
     private static PortModel source(BlueprintGraph g, String name, TypeHandle type) {
         var v = (VariableDeclarationModelBase) g.graphModel.createVariable(name, type, null, VariableKind.INPUT);
         return g.graphModel.createVariableNode(v, new Vector2f(0, 0), null, null).getOutputPort();
     }
 
-    @GameTest(template = "empty")
-
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
 
     public static void inRadius(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();

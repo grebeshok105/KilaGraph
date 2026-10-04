@@ -11,8 +11,7 @@ import com.lowdragmc.kilagraph.test.gametest.KGGraphBuilder;
 import com.lowdragmc.kilagraph.test.gametest.KGGraphFixtures;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 import java.util.OptionalLong;
 
@@ -28,14 +27,12 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertTrue
  * the DSL and asserts the values {@code ExecutorBenchGameTest.locomotion} asserts for the same graph
  * built by hand. That is the only evidence that the DSL wires what it appears to wire.</p>
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class KGGraphBuilderGameTest {
+public final class KGGraphBuilderGameTest implements FabricGameTest {
 
-    private KGGraphBuilderGameTest() {}
+    public KGGraphBuilderGameTest() {}
 
     /** The DSL-built locomotion graph converges to the same values as the hand-built one. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void locomotionMatchesHandBuilt(GameTestHelper helper) {
         var b = KGGraphFixtures.locomotion();
 
@@ -62,8 +59,7 @@ public final class KGGraphBuilderGameTest {
      * first. Guessing here would silently wire a Branch to its true side and leave a graph that
      * looks correct in the source and tests nothing.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void ambiguousBareReferenceIsRejected(GameTestHelper helper) {
         var b = KGGraphBuilder.blueprint();
         b.add("cond", BranchNode.class);
@@ -79,8 +75,7 @@ public final class KGGraphBuilderGameTest {
     }
 
     /** Unknown names and duplicates fail at build time, naming what was actually registered. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void badNamesFailFast(GameTestHelper helper) {
         var b = KGGraphBuilder.blueprint();
         b.add("a", AddNode.class);
@@ -92,8 +87,7 @@ public final class KGGraphBuilderGameTest {
     }
 
     /** {@code addMany} + explicit wiring builds a chain whose value is the chain's arithmetic. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void addManyBuildsAChain(GameTestHelper helper) {
         int n = 8;
         var b = KGGraphBuilder.blueprint();

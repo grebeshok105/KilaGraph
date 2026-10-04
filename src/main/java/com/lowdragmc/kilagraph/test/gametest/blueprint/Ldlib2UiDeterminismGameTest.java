@@ -15,8 +15,7 @@ import com.lowdragmc.lowdraglib2.gui.ui.event.UIEvents;
 import com.lowdragmc.lowdraglib2.nodegraphtookit.api.type.TypeHandles;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,23 +40,20 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertTrue
  * <p>Two executors over one graph is the closest single-process stand-in for two sides: separate pull
  * caches, separate node state, the same nodes.</p>
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class Ldlib2UiDeterminismGameTest {
+public final class Ldlib2UiDeterminismGameTest implements FabricGameTest {
 
-    private Ldlib2UiDeterminismGameTest() {
+    public Ldlib2UiDeterminismGameTest() {
     }
 
     /** A straight-line build registers the same things in the same order, run after run. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void aStraightBuildIsDeterministic(GameTestHelper helper) {
         assertSameRegistrationOrder(helper, "straight build", Ldlib2UiDeterminismGameTest::mixedGraph);
         helper.succeed();
     }
 
     /** A build that makes its rows in a loop is deterministic too — and really does make N of them. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void aLoopedBuildIsDeterministic(GameTestHelper helper) {
         assertSameRegistrationOrder(helper, "looped build", Ldlib2UiDeterminismGameTest::loopGraph);
 

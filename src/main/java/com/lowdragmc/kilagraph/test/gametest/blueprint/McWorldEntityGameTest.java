@@ -25,8 +25,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
@@ -48,16 +47,14 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
  * the environment, per the same pattern as {@code McWorldQueryGameTest}. The executor never knows about
  * the world; a graph that needs one says so on a port.
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class McWorldEntityGameTest {
+public final class McWorldEntityGameTest implements FabricGameTest {
 
     private static final float EPS = 1e-3f;
 
-    private McWorldEntityGameTest() {
+    public McWorldEntityGameTest() {
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void worldQueries(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos abs = helper.absolutePos(new BlockPos(0, 2, 0));
@@ -95,8 +92,7 @@ public final class McWorldEntityGameTest {
     }
 
     /** A ray straight down onto a placed block hits its top face. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void raycastFindsAPlacedBlock(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos target = helper.absolutePos(new BlockPos(0, 2, 0));
@@ -127,8 +123,7 @@ public final class McWorldEntityGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void entityQueriesAndData(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         Entity pig = helper.spawn(EntityType.PIG, new BlockPos(1, 2, 1));
@@ -174,8 +169,7 @@ public final class McWorldEntityGameTest {
     }
 
     /** Enchantments are a datapack registry in 1.21, so this one needs the world. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void enchantmentProbeUsesTheWorldRegistry(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         var sharp = probe(level, RegistryProbeNodes.EnchantmentExists.class,

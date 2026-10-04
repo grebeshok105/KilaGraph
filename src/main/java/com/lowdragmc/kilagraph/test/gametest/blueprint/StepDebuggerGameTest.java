@@ -1,8 +1,7 @@
 package com.lowdragmc.kilagraph.test.gametest.blueprint;
 
 
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
-import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.gametest.framework.GameTest;
 import com.lowdragmc.kilagraph.Kilagraph;
 import com.lowdragmc.kilagraph.blueprint.BlueprintGraph;
@@ -43,8 +42,7 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
  * step count, call stack, variable snapshot). Runs on the server because subgraph graph-variable
  * construction loads MC classes.
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class StepDebuggerGameTest {
+public final class StepDebuggerGameTest implements FabricGameTest {
     private static final String LINEAR = "step_linear_chain";
     private static final String FOR_BODY = "step_into_for_body";
     private static final String BRANCH = "step_branch_chosen_path";
@@ -56,7 +54,7 @@ public final class StepDebuggerGameTest {
     private static final String RESET = "step_reset";
     private static final String CALLSTACK = "step_callstack_and_vars";
 
-    private StepDebuggerGameTest() {}
+    public StepDebuggerGameTest() {}
 
     // ---- helpers --------------------------------------------------------------------------------
 
@@ -76,8 +74,7 @@ public final class StepDebuggerGameTest {
     }
 
     // ---- 1. linear chain --------------------------------------------------------------------
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void linear(GameTestHelper helper) {
         var g = newGraph();
         var entry = addNode(g, EntryNode.class);
@@ -102,8 +99,7 @@ public final class StepDebuggerGameTest {
     }
 
     // ---- 2. step into a For loop body -------------------------------------------------------
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void forBody(GameTestHelper helper) {
         var g = newGraph();
         var entry = addNode(g, EntryNode.class);
@@ -125,8 +121,7 @@ public final class StepDebuggerGameTest {
     }
 
     // ---- 3. branch steps only the chosen path -----------------------------------------------
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void branch(GameTestHelper helper) {
         var g = newGraph();
         var entry = addNode(g, EntryNode.class);
@@ -150,8 +145,7 @@ public final class StepDebuggerGameTest {
     }
 
     // ---- 4. sequence run-to-completion order ------------------------------------------------
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void sequence(GameTestHelper helper) {
         var g = newGraph();
         var entry = addNode(g, EntryNode.class);
@@ -175,8 +169,7 @@ public final class StepDebuggerGameTest {
     }
 
     // ---- 5. break while stepping ------------------------------------------------------------
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void breakStepping(GameTestHelper helper) {
         var g = newGraph();
         var entry = addNode(g, EntryNode.class);
@@ -201,8 +194,7 @@ public final class StepDebuggerGameTest {
     }
 
     // ---- 6. continue while stepping ---------------------------------------------------------
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void continueStepping(GameTestHelper helper) {
         var g = newGraph();
         var entry = addNode(g, EntryNode.class);
@@ -227,8 +219,7 @@ public final class StepDebuggerGameTest {
     }
 
     // ---- 7. step INTO a subgraph ------------------------------------------------------------
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void subgraph(GameTestHelper helper) {
         var outer = newGraph();
         var inner = outer.graphModel.createLocalSubgraphInstance();
@@ -269,8 +260,7 @@ public final class StepDebuggerGameTest {
     }
 
     // ---- 8. breakpoint pauses before the node -----------------------------------------------
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void breakpoint(GameTestHelper helper) {
         var g = newGraph();
         var entry = addNode(g, EntryNode.class);
@@ -292,8 +282,7 @@ public final class StepDebuggerGameTest {
     }
 
     // ---- 9. reset reruns from entry ---------------------------------------------------------
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void reset(GameTestHelper helper) {
         var g = newGraph();
         var entry = addNode(g, EntryNode.class);
@@ -320,8 +309,7 @@ public final class StepDebuggerGameTest {
     }
 
     // ---- 10. callStack shows LOOP frame; variables() snapshot mid-run -----------------------
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void callStackAndVars(GameTestHelper helper) {
         var g = newGraph();
         var entry = addNode(g, EntryNode.class);
@@ -362,8 +350,7 @@ public final class StepDebuggerGameTest {
      * branch, and on every subgraph exit. A debugger that reports the next node from it either
      * skips the breakpoint entirely or names a node from an outer frame that will not run next.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void breakpointInsideLoopBody(GameTestHelper helper) {
         var g = newGraph();
         var entry = addNode(g, EntryNode.class);
@@ -395,8 +382,7 @@ public final class StepDebuggerGameTest {
      * {@code Noop} in that order, so the root frame still holds {@code Noop} while the loop body is
      * what actually runs next.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void currentNodeMatchesWhatStepRuns(GameTestHelper helper) {
         var g = newGraph();
         var entry = addNode(g, EntryNode.class);

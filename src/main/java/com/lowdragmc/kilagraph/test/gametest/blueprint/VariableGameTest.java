@@ -12,8 +12,7 @@ import java.util.Map;
 import java.util.OptionalLong;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import org.joml.Vector2f;
 
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.addNode;
@@ -26,18 +25,16 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
  * Exercises the executor's variable runtime: env-store-driven {@code IVariableNode} reads
  * and {@link GraphExecutor#runOutputs()} writes through "set var" form variable nodes.
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class VariableGameTest {
+public final class VariableGameTest implements FabricGameTest {
     private static final String INPUT_VAR_READ_FROM_STORE = "var_input_read_from_store";
     private static final String OUTPUT_VAR_RUN_OUTPUTS = "var_output_run_outputs";
     private static final String OUTPUT_VAR_DEFAULT_WHEN_UNWIRED = "var_output_default_when_unwired";
     private static final String STORE_NULL_OVERRIDES_DEFAULT = "var_store_null_overrides_default";
 
-    private VariableGameTest() {}
+    public VariableGameTest() {}
 
     // --- 1. INPUT variable's "get" node reads from the env store ----------------------------------
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void inputVarReadFromStore(GameTestHelper helper) {
         var graph = newGraph();
 
@@ -61,8 +58,7 @@ public final class VariableGameTest {
     }
 
     // --- 2. runOutputs() pulls AddNode result through OUTPUT variable's "set" node ----------------
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void outputVarRunOutputs(GameTestHelper helper) {
         var graph = newGraph();
 
@@ -99,8 +95,7 @@ public final class VariableGameTest {
     }
 
     // --- 3. Unwired OUTPUT variable falls back to the declared default ----------------------------
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void outputVarDefaultWhenUnwired(GameTestHelper helper) {
         var graph = newGraph();
         graph.graphModel.createVariable("y", int.class, 42, VariableKind.OUTPUT);
@@ -117,8 +112,7 @@ public final class VariableGameTest {
     }
 
     // --- 4. Variable store entry with null wins over declared default -----------------------------
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void storeNullOverridesDefault(GameTestHelper helper) {
         var graph = newGraph();
         graph.graphModel.createVariable("y", int.class, 42, VariableKind.OUTPUT);
@@ -142,8 +136,7 @@ public final class VariableGameTest {
      * unset used to throw from {@code DataResult.result()} ({@code Optional.of(null)}) and take
      * the whole run down with it.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void nullDefaultReadsNullRatherThanThrowing(GameTestHelper helper) {
         var graph = newGraph();
         // an Entity, not a String: a String constant normalises a null default to "" and never

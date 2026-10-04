@@ -1,8 +1,13 @@
 pluginManagement {
     repositories {
+        maven {
+            name = 'Fabric'
+            url = 'https://maven.fabricmc.net/'
+        }
+        // maven-central mirror: repo.maven.apache.org is rate-limited (429) from this network
+        maven { url = 'https://maven.aliyun.com/repository/central' }
         mavenLocal()
         gradlePluginPortal()
-        maven { url = 'https://maven.neoforged.net/releases' }
     }
 }
 
@@ -10,4 +15,4 @@ plugins {
     id 'org.gradle.toolchains.foojay-resolver-convention' version '0.8.0'
 }
 
-rootProject.name = "${mod_id}-neoforge"
+rootProject.name = "${mod_id}-fabric"

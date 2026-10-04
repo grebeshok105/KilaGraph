@@ -13,8 +13,7 @@ import com.lowdragmc.lowdraglib2.nodegraphtookit.model.node.NodeModel;
 import com.lowdragmc.lowdraglib2.nodegraphtookit.model.node.PortModel;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -26,8 +25,7 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertTrue
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.newGraph;
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.setInputConstant;
 
-@GameTestHolder(Kilagraph.MODID)
-public final class QuaternionNodeGameTest {
+public final class QuaternionNodeGameTest implements FabricGameTest {
     private static final float EPS = 1e-4f;
 
     private static final float ROT_EPS = 1e-3f;
@@ -39,11 +37,10 @@ public final class QuaternionNodeGameTest {
             {0f, 45f}, {0f, -45f}, {37f, 21f}, {-143f, -67f}, {250f, 12f},
     };
 
-    private QuaternionNodeGameTest() {
+    public QuaternionNodeGameTest() {
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void fromEulerMatchesVectorFromRotation(GameTestHelper helper) {
         for (float[] yp : ANGLES) {
             float yaw = yp[0], pitch = yp[1];
@@ -60,8 +57,7 @@ public final class QuaternionNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void eulerRoundTrips(GameTestHelper helper) {
         for (float[] yp : ANGLES) {
             Quaternionf q = fromEuler(yp[0], yp[1], 0f);
@@ -81,8 +77,7 @@ public final class QuaternionNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void fromAxisAngleMatchesRotateAboutAxis(GameTestHelper helper) {
         Vector3f[] axes = {
                 new Vector3f(0f, 1f, 0f), new Vector3f(1f, 0f, 0f), new Vector3f(0f, 0f, 1f),
@@ -103,8 +98,7 @@ public final class QuaternionNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void multiplyComposesRightToLeft(GameTestHelper helper) {
         Quaternionf turn = fromEuler(90f, 0f, 0f);
         Quaternionf look = fromEuler(0f, 45f, 0f);
@@ -124,8 +118,7 @@ public final class QuaternionNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void identityIsNoRotation(GameTestHelper helper) {
         Quaternionf none = identity();
         assertEq(helper, "x", 0f, none.x, 0f);
@@ -144,8 +137,7 @@ public final class QuaternionNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void inverseUndoesTheRotation(GameTestHelper helper) {
         Quaternionf q = fromEuler(37f, 21f, 15f);
         assertSame(helper, "q times its inverse is the identity",
@@ -161,8 +153,7 @@ public final class QuaternionNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void slerpTakesTheShortArc(GameTestHelper helper) {
         Quaternionf none = new Quaternionf();
         Quaternionf ninety = fromEuler(90f, 0f, 0f);
@@ -186,8 +177,7 @@ public final class QuaternionNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void fromToTurnsOneDirectionIntoTheOther(GameTestHelper helper) {
         Vector3f[][] pairs = {
                 {new Vector3f(0f, 0f, 1f), new Vector3f(1f, 0f, 0f)},
@@ -213,8 +203,7 @@ public final class QuaternionNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void angleBetweenIsTheShortestTurn(GameTestHelper helper) {
         Quaternionf none = new Quaternionf();
         assertEq(helper, "nothing to nothing", 0f, angleBetween(none, none), EPS);
@@ -230,8 +219,7 @@ public final class QuaternionNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void theVec4BridgeRoundTripsExactly(GameTestHelper helper) {
         Quaternionf q = fromEuler(37f, 21f, 15f);
         Object packed = toVec4(q);
@@ -256,8 +244,7 @@ public final class QuaternionNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void quatPinsDoNotAcceptVectorsOrViceVersa(GameTestHelper helper) {
         BlueprintGraph g = newGraph();
         NodeModel packer = addNode(g, QuaternionNodes.ToVec4.class);
@@ -283,8 +270,7 @@ public final class QuaternionNodeGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void degenerateInputsAnswerRatherThanFail(GameTestHelper helper) {
         Quaternionf zero = new Quaternionf(0f, 0f, 0f, 0f);
         assertSame(helper, "normalizing nothing", new Quaternionf(), normalize(zero));

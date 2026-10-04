@@ -27,8 +27,7 @@ import java.util.OptionalLong;
 import java.util.function.Consumer;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import org.joml.Vector2f;
 
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.addNode;
@@ -59,10 +58,9 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
  *       own compiled program costs on the same machine (doc 18 §7.2).</li>
  * </ol>
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class ExecutorBenchGameTest {
+public final class ExecutorBenchGameTest implements FabricGameTest {
 
-    private ExecutorBenchGameTest() {}
+    public ExecutorBenchGameTest() {}
 
     private static final int CHAIN_LENGTH = 16;
     private static final int WARMUP = 4_000;
@@ -75,8 +73,7 @@ public final class ExecutorBenchGameTest {
      * inputs — one wired, two embedded constants — so the measurement covers both halves of
      * {@code pullInput}.
      */
-    @GameTest(template = "empty", timeoutTicks = 4000)
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty", timeoutTicks = 4000)
     public static void lerpChain16(GameTestHelper helper) {
         var g = newGraph();
         NodeModel head = null;
@@ -139,8 +136,7 @@ public final class ExecutorBenchGameTest {
      * but the node declares its inputs dynamically from an option and reads them by a
      * <em>constructed</em> id ({@code "in" + i}), which is how much of the library is written.
      */
-    @GameTest(template = "empty", timeoutTicks = 4000)
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty", timeoutTicks = 4000)
     public static void addChain16(GameTestHelper helper) {
         var g = newGraph();
         NodeModel tail = null;
@@ -193,8 +189,7 @@ public final class ExecutorBenchGameTest {
      *
      * Each run is one frame for one entity: {@code clearCache()} then {@code executeFrom(entry)}.
      */
-    @GameTest(template = "empty", timeoutTicks = 4000)
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty", timeoutTicks = 4000)
     public static void locomotion(GameTestHelper helper) {
         var g = newGraph();
 
@@ -357,8 +352,7 @@ public final class ExecutorBenchGameTest {
      *
      * Sweeping N separates per-node cost (the slope) from fixed per-run cost (the intercept).
      */
-    @GameTest(template = "empty", timeoutTicks = 6000)
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty", timeoutTicks = 6000)
     public static void costBreakdown(GameTestHelper helper) {
         int[] lengths = {4, 16, 64};
         for (int n : lengths) {

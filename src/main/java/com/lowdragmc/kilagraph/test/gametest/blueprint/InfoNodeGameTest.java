@@ -20,8 +20,7 @@ import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import org.joml.Vector3f;
 
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.addBlock;
@@ -42,15 +41,13 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.setInputCo
  * than class-casting. The last two are what replaced a reflective property picker, so they are the ones
  * worth pinning.
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class InfoNodeGameTest {
+public final class InfoNodeGameTest implements FabricGameTest {
 
-    private InfoNodeGameTest() {
+    public InfoNodeGameTest() {
     }
 
     /** One context feeding several blocks: each reads a different property of the same target. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void oneTargetManyBlocks(GameTestHelper helper) {
         Entity pig = helper.spawn(EntityType.PIG, new BlockPos(1, 2, 1));
 
@@ -76,8 +73,7 @@ public final class InfoNodeGameTest {
      * <p>A half-built graph has to stay evaluable — the alternative would let one unwired context take
      * down branches that do not depend on it.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void missingTargetReadsNull(GameTestHelper helper) {
         var g = newGraph();
         var ctx = addNode(g, EntityInfoNode.class);
@@ -101,8 +97,7 @@ public final class InfoNodeGameTest {
      * defence in depth rather than the mechanism: a mismatched pair cannot be built through this API at
      * all, so the check only covers a target whose runtime type is narrower than the port's.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void contextRefusesAForeignBlock(GameTestHelper helper) {
         var g = newGraph();
         var ctx = addNode(g, EntityInfoNode.class);
@@ -129,8 +124,7 @@ public final class InfoNodeGameTest {
      * separate context rather than a duplicate one — while {@code EntityInfoNode} takes only entity
      * blocks, and neither takes another context's.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void blocksAreScopedToTheirContexts(GameTestHelper helper) {
         assertTrue(helper, "entity context takes entity blocks",
                 accepts(EntityInfoNode.class, EntityInfoBlocks.Position.class));
@@ -160,8 +154,7 @@ public final class InfoNodeGameTest {
      * and had to be swapped out member by member. A declared output port cannot get this wrong, and this
      * asserts it stays that way.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void positionBlocksUseTheGraphVectorType(GameTestHelper helper) {
         Entity pig = helper.spawn(EntityType.PIG, new BlockPos(1, 2, 1));
         for (Class<? extends BlockNode> cls : List.of(

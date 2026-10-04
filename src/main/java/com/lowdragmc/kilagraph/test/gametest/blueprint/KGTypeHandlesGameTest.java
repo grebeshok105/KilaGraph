@@ -8,8 +8,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 import java.util.List;
 
@@ -36,10 +35,9 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.newGraph;
  * Hence {@link #everyConstantTypeHasANonNullDefault}: it is a property of the whole vocabulary rather
  * than of any one type, so it belongs in one enumerating test rather than in each type's own.
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class KGTypeHandlesGameTest {
+public final class KGTypeHandlesGameTest implements FabricGameTest {
 
-    private KGTypeHandlesGameTest() {
+    public KGTypeHandlesGameTest() {
     }
 
     /**
@@ -48,8 +46,7 @@ public final class KGTypeHandlesGameTest {
      * <p>Enumerated from {@code getLibrarySupportTypes()} rather than hand-listed, so a type added
      * later cannot skip the check by not being mentioned here.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void everyConstantTypeHasANonNullDefault(GameTestHelper helper) {
         List<TypeHandle> offered = newGraph().getLibrarySupportTypes();
         assertTrue(helper, "the library offers some constant types", !offered.isEmpty());
@@ -71,8 +68,7 @@ public final class KGTypeHandlesGameTest {
      * anything that "fixed" this by taking the first enum constant would still disagree with every
      * node in the library, all of which default their Direction inputs to NORTH.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void directionAndNbtDefaultsAreTheOnesTheNodesUse(GameTestHelper helper) {
         assertEq(helper, "Direction default", Direction.NORTH, TypeHandles.DIRECTION.getDefaultValue());
 
@@ -90,8 +86,7 @@ public final class KGTypeHandlesGameTest {
      * has no accessor, so its constant node renders an empty inspector row and emits null; offering it
      * is offering a node that cannot do anything.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void wireOnlyTypesArePickableButNotAuthorable(GameTestHelper helper) {
         var graph = newGraph();
         List<TypeHandle> pickable = graph.getSupportTypes();
@@ -115,8 +110,7 @@ public final class KGTypeHandlesGameTest {
      * nothing on its own, because both surfaces are hand-maintained lists in {@code BlueprintGraph}.
      * {@code NBT_COMPOUND} was minted and left out of both for exactly that reason.</p>
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void newValueTypesAreSurfacedInBothLists(GameTestHelper helper) {
         var graph = newGraph();
         List<TypeHandle> pickable = graph.getSupportTypes();

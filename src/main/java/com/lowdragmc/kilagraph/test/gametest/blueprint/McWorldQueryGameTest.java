@@ -22,8 +22,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import org.joml.Vector2f;
 
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.addNode;
@@ -39,12 +38,11 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.wire;
  * the nodes the framework-supported way: a wire-only graph variable seeded with the live level (the
  * executor itself never knows about the world).
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class McWorldQueryGameTest {
+public final class McWorldQueryGameTest implements FabricGameTest {
     private static final String READ_BLOCK = "mc_world_read_block";
     private static final String EMPTY_AND_BE = "mc_world_empty_and_block_entity";
 
-    private McWorldQueryGameTest() {}
+    public McWorldQueryGameTest() {}
 
     /** Declares a wire-only "level" INPUT variable, returns its get-node output port. */
     private static PortModel levelSource(BlueprintGraph g) {
@@ -58,8 +56,7 @@ public final class McWorldQueryGameTest {
     }
 
     /** setBlock(stone) then GetBlock / GetBlockState / IsEmptyBlock at that pos. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void readBlock(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos abs = helper.absolutePos(new BlockPos(0, 2, 0));
@@ -92,8 +89,7 @@ public final class McWorldQueryGameTest {
     }
 
     /** IsEmptyBlock true over air; GetBlockEntity non-null on a chest, null on stone. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void emptyAndBlockEntity(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos air = helper.absolutePos(new BlockPos(0, 6, 0));

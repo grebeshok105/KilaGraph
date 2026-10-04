@@ -13,8 +13,7 @@ import com.lowdragmc.kilagraph.graph.exec.GraphExecutor;
 import com.lowdragmc.kilagraph.test.gametest.KGGraphBuilder;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 
 import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertEq;
 
@@ -31,17 +30,15 @@ import static com.lowdragmc.kilagraph.test.gametest.KGGameTestHelpers.assertEq;
  * ({@code ensureComputed} → {@code evaluateNode} → a node's {@code evaluate} → {@code pullInput} →
  * {@code ensureComputed}), so a long chain is a deep Java stack.</p>
  */
-@GameTestHolder(Kilagraph.MODID)
-public final class DeepGraphGameTest {
+public final class DeepGraphGameTest implements FabricGameTest {
 
-    private DeepGraphGameTest() {}
+    public DeepGraphGameTest() {}
 
     private static final int DEEP = 64;
     private static final int WIDE = 32;
 
     /** A 64-long data chain: each link adds one, so the value is the depth actually traversed. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void deepDataChain(GameTestHelper helper) {
         var b = chainOfAdds(DEEP);
         var exec = new GraphExecutor(b.graph());
@@ -55,8 +52,7 @@ public final class DeepGraphGameTest {
      * second run re-walks the whole depth against tables the first run already grew, which is the
      * path a long-lived executor actually takes.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void deepChainRecomputesAfterClearCache(GameTestHelper helper) {
         var b = chainOfAdds(DEEP);
         var exec = new GraphExecutor(b.graph());
@@ -74,8 +70,7 @@ public final class DeepGraphGameTest {
     }
 
     /** A 32-input {@code Add}, each input produced by its own node: one node, thirty-two edges. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void wideFanIn(GameTestHelper helper) {
         var b = KGGraphBuilder.blueprint();
         b.add("wide", AddNode.class).option("wide", "inputs", WIDE);
@@ -94,8 +89,7 @@ public final class DeepGraphGameTest {
     }
 
     /** One node feeding 32 consumers is still evaluated once. Fan-out, where the memo earns its keep. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void wideFanOutEvaluatesTheSourceOnce(GameTestHelper helper) {
         var b = KGGraphBuilder.blueprint();
         b.add("shared", AddNode.class).constant("shared.in1", 2f).constant("shared.in2", 3f);
@@ -116,8 +110,7 @@ public final class DeepGraphGameTest {
     }
 
     /** A 64-node exec chain runs every node exactly once, in order. */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void deepExecChain(GameTestHelper helper) {
         var b = KGGraphBuilder.blueprint();
         b.add("entry", EntryNode.class);
@@ -141,8 +134,7 @@ public final class DeepGraphGameTest {
      * and only the taken side runs. Depth and control flow interleaved, which neither shape alone
      * exercises.
      */
-    @GameTest(template = "empty")
-    @PrefixGameTestTemplate(false)
+    @GameTest(template = "kilagraph:empty")
     public static void deepChainDrivingABranch(GameTestHelper helper) {
         var b = chainOfAdds(DEEP);
         b.add("gt", GreaterThanNode.class)
