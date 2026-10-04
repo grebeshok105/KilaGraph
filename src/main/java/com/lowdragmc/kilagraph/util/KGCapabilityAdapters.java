@@ -169,7 +169,8 @@ public final class KGCapabilityAdapters {
         public int getTankCapacity(int tank) {
             var views = fluidTanks(storage);
             if (tank < 0 || tank >= views.size()) return 0;
-            return (int) Math.min(Integer.MAX_VALUE, views.get(tank).getCapacity());
+            // StorageView capacities are droplets; the IFluidHandler contract is mB.
+            return FluidUnits.dropletsToMbInt(views.get(tank).getCapacity());
         }
 
         @Override
@@ -206,11 +207,13 @@ public final class KGCapabilityAdapters {
         @Override
         public @NotNull FluidStack drain(int maxDrain, FluidAction action) {
             if (maxDrain <= 0) return FluidStack.empty();
+            // IFluidHandler callers pass mB; fabric storages extract droplets.
+            long maxDrainDroplets = FluidUnits.mbToDroplets(maxDrain);
             for (var view : fluidTanks(storage)) {
                 if (view.isResourceBlank()) continue;
                 try (Transaction tx = Transaction.openOuter()) {
                     var variant = view.getResource();
-                    long drained = view.extract(variant, maxDrain, tx);
+                    long drained = view.extract(variant, maxDrainDroplets, tx);
                     if (drained > 0) {
                         if (action.execute()) tx.commit();
                         return FluidStack.create(variant.getFluid(), drained, variant.getComponents());

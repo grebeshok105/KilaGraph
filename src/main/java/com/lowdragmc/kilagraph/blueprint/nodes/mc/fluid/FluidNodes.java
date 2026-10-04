@@ -5,6 +5,7 @@ import com.lowdragmc.kilagraph.graph.core.AnnotatedNode;
 import com.lowdragmc.kilagraph.graph.core.InputPort;
 import com.lowdragmc.kilagraph.graph.core.OutputPort;
 import com.lowdragmc.kilagraph.graph.exec.EvalContext;
+import com.lowdragmc.kilagraph.util.FluidUnits;
 import com.lowdragmc.lowdraglib2.nodegraphtookit.api.node.NodeAttribute;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
@@ -61,7 +62,7 @@ public final class FluidNodes {
         public void evaluate(EvalContext ctx) {
             FluidStack s = stack(ctx, "stack");
             ctx.setOutput("fluid", s.getFluid());
-            ctx.setOutput("amount", s.getAmount());
+            ctx.setOutput("amount", FluidUnits.dropletsToMbInt(s.getAmount()));
             ctx.setOutput("empty", s.isEmpty());
             ctx.setOutput("name", (Object) s.getName());
         }
@@ -112,7 +113,7 @@ public final class FluidNodes {
             // would happily build an inconsistent stack out of one but not the other.
             ctx.setOutput("out", f == null || f == Fluids.EMPTY || amount == 0
                     ? FluidStack.empty()
-                    : FluidStack.create(f, amount));
+                    : FluidStack.create(f, FluidUnits.mbToDroplets(amount)));
         }
     }
 
@@ -138,7 +139,7 @@ public final class FluidNodes {
             // copy first: a FluidStack is mutable and the input may already have been handed to
             // another branch of this run.
             FluidStack copy = s.copy();
-            copy.setAmount(amount);
+            copy.setAmount(FluidUnits.mbToDroplets(amount));
             ctx.setOutput("out", copy);
         }
     }

@@ -15,6 +15,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
+import com.lowdragmc.kilagraph.util.FluidUnits;
 import com.lowdragmc.kilagraph.util.KGCapabilityAdapters;
 import dev.architectury.fluid.FluidStack;
 import com.lowdragmc.lowdraglib2.utils.fluids.IFluidHandler;
@@ -170,8 +171,9 @@ public final class FluidContainerNodes {
                 McActions.done(ctx, false);
                 return;
             }
+            // fill returns the stack-internal unit (droplets); the port reports mB.
             int moved = h.fill(give, action(ctx));
-            ctx.setOutput("filled", moved);
+            ctx.setOutput("filled", FluidUnits.dropletsToMbInt(moved));
             McActions.done(ctx, moved > 0);
         }
     }
