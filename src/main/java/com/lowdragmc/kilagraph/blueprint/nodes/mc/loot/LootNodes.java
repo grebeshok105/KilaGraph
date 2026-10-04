@@ -19,7 +19,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -55,6 +55,18 @@ import java.util.List;
 public final class LootNodes {
 
     private static final String GROUP = "mc/loot";
+
+    /**
+     * The parameter set a roll is built against: everything the node's inputs can supply is
+     * declared optional, nothing is required. {@code EMPTY} rejects every supplied parameter and
+     * {@code ALL_PARAMS} demands nearly all of them, so neither named set fits a node whose whole
+     * contract is "supply what was given and let the table read what it needs".
+     */
+    private static final LootContextParamSet ROLL_PARAMS = LootContextParamSet.builder()
+            .optional(LootContextParams.ORIGIN)
+            .optional(LootContextParams.THIS_ENTITY)
+            .optional(LootContextParams.TOOL)
+            .build();
 
     private LootNodes() {
     }
@@ -121,9 +133,9 @@ public final class LootNodes {
                     .withOptionalParameter(LootContextParams.THIS_ENTITY, ctx.getInput("entity", Entity.class, null))
                     .withOptionalParameter(LootContextParams.TOOL,
                             heldTool == null || heldTool.isEmpty() ? null : heldTool)
-                    // EMPTY requires nothing, so building the parameters cannot fail here; a table that
-                    // wants more than was supplied fails while rolling instead, below.
-                    .create(LootContextParamSets.EMPTY);
+                    // ROLL_PARAMS requires nothing, so building the parameters cannot fail here;
+                    // a table that wants more than was supplied fails while rolling instead, below.
+                    .create(ROLL_PARAMS);
 
             List<ItemStack> items;
             try {
