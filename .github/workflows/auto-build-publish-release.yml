@@ -226,13 +226,13 @@ jobs:
             build/libs/!(*-@(all|dev|sources|javadoc|dev-shadow)).jar
             build/libs/*-@(sources).jar
 
-          name: KilaGraph-1.21.1-${{ needs.validate.outputs.version }}-neoforge
-          version: mc1.21.1-${{ needs.validate.outputs.version }}-neoforge
+          name: KilaGraph-1.21.1-${{ needs.validate.outputs.version }}-fabric
+          version: mc1.21.1-${{ needs.validate.outputs.version }}-fabric
           version-type: ${{ inputs.versionType }}
           changelog-file: CHANGELOG.*
 
           loaders: |
-            neoforge
+            fabric
           game-versions: |
             1.21.1
           game-version-filter: none
