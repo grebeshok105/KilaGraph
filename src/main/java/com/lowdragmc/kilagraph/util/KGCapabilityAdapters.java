@@ -3,19 +3,27 @@ package com.lowdragmc.kilagraph.util;
 import com.lowdragmc.lowdraglib2.utils.fluids.FluidAction;
 import com.lowdragmc.lowdraglib2.utils.fluids.IFluidHandler;
 import com.lowdragmc.lowdraglib2.utils.items.IItemHandler;
+import com.lowdragmc.lowdraglib2.utils.items.IItemHandlerModifiable;
 import dev.architectury.fluid.FluidStack;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.item.PlayerInventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.storage.SlottedStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
+import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -23,6 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -52,12 +61,21 @@ public final class KGCapabilityAdapters {
 
     /**
      * {@code entity.getCapability(Capabilities.ItemHandler.ENTITY)}. Fabric has no generic
-     * entity item lookup — players expose their inventory, everything else reports none.
+     * entity item lookup, so the neoforge fallback is reproduced instead: players expose
+     * their inventory, other living entities their equipment (hands and armour — the
+     * upstream semantics that let a pig resolve too), and any entity carrying a
+     * {@link Container} (chest minecarts, ...) that container. Everything else reports none.
      */
     @Nullable
     public static IItemHandler entityItemHandler(@Nullable Entity entity) {
         if (entity instanceof Player player) {
-            return new ItemStorageHandler(InventoryStorage.of(player.getInventory(), null));
+            return new ItemStorageHandler(PlayerInventoryStorage.of(player));
+        }
+        if (entity instanceof LivingEntity living) {
+            return new ItemStorageHandler(new EquipmentStorage(living));
+        }
+        if (entity instanceof Container container) {
+            return new ItemStorageHandler(InventoryStorage.of(container, null));
         }
         return null;
     }
@@ -79,7 +97,7 @@ public final class KGCapabilityAdapters {
         return tanks;
     }
 
-    private static final class ItemStorageHandler implements IItemHandler {
+    private static final class ItemStorageHandler implements IItemHandlerModifiable {
         private final Storage<ItemVariant> storage;
 
         private ItemStorageHandler(Storage<ItemVariant> storage) {
@@ -119,10 +137,35 @@ public final class KGCapabilityAdapters {
             var views = itemSlots(storage);
             if (slot < 0 || slot >= views.size()) return ItemStack.EMPTY;
             var view = views.get(slot);
+            // an empty slot reports a blank variant, which extract() rejects outright
+            if (view.isResourceBlank()) return ItemStack.EMPTY;
             try (Transaction tx = Transaction.openOuter()) {
                 long extracted = view.extract(view.getResource(), amount, tx);
                 if (!simulate) tx.commit();
                 return view.getResource().toStack((int) Math.min(Integer.MAX_VALUE, extracted));
+            }
+        }
+
+        /**
+         * Fabric has no set-slot primitive: a slotted slot is overwritten by extracting
+         * whatever it holds and inserting the stack inside one transaction. A non-slotted
+         * {@code Storage<ItemVariant>} exposes nothing addressable, so this degrades to a no-op.
+         */
+        @Override
+        public void setStackInSlot(int slot, @NotNull ItemStack stack) {
+            if (!(storage instanceof SlottedStorage<ItemVariant> slotted)
+                    || slot < 0 || slot >= slotted.getSlotCount()) return;
+            SingleSlotStorage<ItemVariant> slotStorage = slotted.getSlot(slot);
+            try (Transaction tx = Transaction.openOuter()) {
+                ItemVariant current = slotStorage.getResource();
+                // an empty slot reports a blank variant, which extract() rejects outright
+                if (!current.isBlank()) {
+                    slotStorage.extract(current, slotStorage.getAmount(), tx);
+                }
+                if (!stack.isEmpty()) {
+                    slotStorage.insert(ItemVariant.of(stack), stack.getCount(), tx);
+                }
+                tx.commit();
             }
         }
 
@@ -139,6 +182,142 @@ public final class KGCapabilityAdapters {
             if (slot < 0 || slot >= views.size()) return false;
             try (Transaction tx = Transaction.openOuter()) {
                 return storage.insert(ItemVariant.of(stack), stack.getCount(), tx) > 0;
+            }
+        }
+    }
+
+    /**
+     * A living entity's equipment (hands, armour, body) as a slotted storage — the fabric
+     * counterpart of the entity item-handler capability NeoForge registers for every living
+     * entity. Slot order is {@link EquipmentSlot}'s, so slot 0 is the main hand. Each slot is
+     * a {@link SnapshotParticipant} so transactions roll the entity's equipment back on abort.
+     */
+    private static final class EquipmentStorage implements SlottedStorage<ItemVariant> {
+        private static final EquipmentSlot[] SLOTS = EquipmentSlot.values();
+        private final LivingEntity entity;
+
+        private EquipmentStorage(LivingEntity entity) {
+            this.entity = entity;
+        }
+
+        @Override
+        public int getSlotCount() {
+            return SLOTS.length;
+        }
+
+        @Override
+        public SingleSlotStorage<ItemVariant> getSlot(int slot) {
+            return new EquipmentSlotView(SLOTS[slot]);
+        }
+
+        @Override
+        public long insert(ItemVariant variant, long maxAmount, TransactionContext tx) {
+            long inserted = 0;
+            for (int i = 0; i < SLOTS.length && inserted < maxAmount; i++) {
+                inserted += getSlot(i).insert(variant, maxAmount - inserted, tx);
+            }
+            return inserted;
+        }
+
+        @Override
+        public long extract(ItemVariant variant, long maxAmount, TransactionContext tx) {
+            long extracted = 0;
+            for (int i = 0; i < SLOTS.length && extracted < maxAmount; i++) {
+                extracted += getSlot(i).extract(variant, maxAmount - extracted, tx);
+            }
+            return extracted;
+        }
+
+        @Override
+        public Iterator<StorageView<ItemVariant>> iterator() {
+            return new Iterator<>() {
+                private int i;
+                @Override
+                public boolean hasNext() {
+                    return i < SLOTS.length;
+                }
+                @Override
+                public StorageView<ItemVariant> next() {
+                    return getSlot(i++);
+                }
+            };
+        }
+
+        private final class EquipmentSlotView extends SnapshotParticipant<ItemStack>
+                implements SingleSlotStorage<ItemVariant> {
+            private final EquipmentSlot slot;
+
+            private EquipmentSlotView(EquipmentSlot slot) {
+                this.slot = slot;
+            }
+
+            private ItemStack getStack() {
+                return entity.getItemBySlot(slot);
+            }
+
+            @Override
+            public long insert(ItemVariant variant, long maxAmount, TransactionContext tx) {
+                if (variant.isBlank() || maxAmount <= 0) return 0;
+                ItemStack current = getStack();
+                if (current.isEmpty()) {
+                    int accepted = (int) Math.min(maxAmount, variant.getItem().getDefaultMaxStackSize());
+                    if (accepted <= 0) return 0;
+                    updateSnapshots(tx);
+                    entity.setItemSlot(slot, variant.toStack(accepted));
+                    return accepted;
+                }
+                if (!variant.equals(ItemVariant.of(current))
+                        || current.getCount() >= current.getMaxStackSize()) return 0;
+                int accepted = (int) Math.min(maxAmount, current.getMaxStackSize() - current.getCount());
+                if (accepted <= 0) return 0;
+                updateSnapshots(tx);
+                ItemStack grown = current.copy();
+                grown.grow(accepted);
+                entity.setItemSlot(slot, grown);
+                return accepted;
+            }
+
+            @Override
+            public long extract(ItemVariant variant, long maxAmount, TransactionContext tx) {
+                ItemStack current = getStack();
+                if (variant.isBlank() || maxAmount <= 0 || current.isEmpty()
+                        || !variant.equals(ItemVariant.of(current))) return 0;
+                int taken = (int) Math.min(maxAmount, current.getCount());
+                updateSnapshots(tx);
+                ItemStack remaining = current.copy();
+                remaining.shrink(taken);
+                entity.setItemSlot(slot, remaining);
+                return taken;
+            }
+
+            @Override
+            public boolean isResourceBlank() {
+                return getStack().isEmpty();
+            }
+
+            @Override
+            public ItemVariant getResource() {
+                return ItemVariant.of(getStack());
+            }
+
+            @Override
+            public long getAmount() {
+                return getStack().getCount();
+            }
+
+            @Override
+            public long getCapacity() {
+                return getStack().getMaxStackSize();
+            }
+
+            @Override
+            protected ItemStack createSnapshot() {
+                return getStack().copy();
+            }
+
+            @Override
+            protected void readSnapshot(ItemStack snapshot) {
+                entity.setItemSlot(slot, snapshot);
             }
         }
     }
