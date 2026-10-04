@@ -11,6 +11,7 @@ import com.lowdragmc.kilagraph.blueprint.nodes.mc.id.McIdNodes;
 import com.lowdragmc.kilagraph.blueprint.nodes.mc.item.ItemStackNodes;
 import com.lowdragmc.kilagraph.blueprint.nodes.mc.text.TextNodes;
 import com.lowdragmc.kilagraph.graph.exec.GraphExecutor;
+import com.lowdragmc.kilagraph.util.FluidUnits;
 import com.lowdragmc.kilagraph.graph.type.KGTypeHandles;
 import com.lowdragmc.lowdraglib2.nodegraphtookit.api.node.Node;
 import com.lowdragmc.lowdraglib2.nodegraphtookit.api.type.TypeHandle;
@@ -236,7 +237,8 @@ public final class McStructureGameTest implements FabricGameTest {
     public static void fluidStacks(GameTestHelper helper) {
         var create = node(FluidNodes.Create.class, "fluid", Fluids.WATER, "amount", 500);
         FluidStack stack = eval(create, "out", FluidStack.class);
-        assertEq(helper, "amount", 500, stack.getAmount());
+        // raw stack amounts are droplets internally; the node's 500 was mB at the boundary
+        assertEq(helper, "amount", FluidUnits.mbToDroplets(500), stack.getAmount());
         assertEq(helper, "fluid", Fluids.WATER, stack.getFluid());
 
         // an empty fluid or a zero amount both mean nothing
@@ -247,7 +249,8 @@ public final class McStructureGameTest implements FabricGameTest {
 
         var resized = node(FluidNodes.WithAmount.class, "stack", FluidStack.create(Fluids.LAVA, 100),
                 "amount", 250);
-        assertEq(helper, "with amount", 250, eval(resized, "out", FluidStack.class).getAmount());
+        assertEq(helper, "with amount", FluidUnits.mbToDroplets(250),
+                eval(resized, "out", FluidStack.class).getAmount());
         assertEq(helper, "with amount keeps the fluid", Fluids.LAVA,
                 eval(resized, "out", FluidStack.class).getFluid());
 

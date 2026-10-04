@@ -35,6 +35,7 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.material.Fluids;
+import com.lowdragmc.kilagraph.util.FluidUnits;
 import dev.architectury.fluid.FluidStack;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import org.joml.Vector2f;
@@ -341,7 +342,7 @@ public final class McContainerGameTest implements FabricGameTest {
         // --- and filling it puts the water back ---
         var fill = runFluid(level, cauldron, FluidContainerNodes.Fill.class,
                 "fluid", FluidStack.create(
-                        Fluids.WATER, 1000));
+                        Fluids.WATER, FluidUnits.mbToDroplets(1000)));
         assertTrue(helper, "the fill reported success", fill.ok());
         assertTrue(helper, "and moved something", fill.get("filled", Integer.class) > 0);
         assertEq(helper, "and the cauldron holds water again", Blocks.WATER_CAULDRON,
@@ -377,7 +378,7 @@ public final class McContainerGameTest implements FabricGameTest {
 
         var fill = runFluid(level, stone, FluidContainerNodes.Fill.class,
                 "fluid", FluidStack.create(
-                        Fluids.WATER, 1000));
+                        Fluids.WATER, FluidUnits.mbToDroplets(1000)));
         assertFalse(helper, "filling a non-tank is refused", fill.ok());
         assertEq(helper, "with nothing moved", 0, fill.get("filled", Integer.class).intValue());
 

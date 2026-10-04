@@ -49,6 +49,17 @@ loom {
             sourceSet sourceSets.main
         }
     }
+    runs {
+        // Runs the fabric-gametest entrypoints declared in fabric.mod.json (the tests live in
+        // src/main, so loom's fabricApi.configureTests() gametest source set does not apply) and
+        // exits the server with a status code when they finish. Task: runGameTestServer.
+        gameTestServer {
+            inherit server
+            name "Game Test Server"
+            property 'fabric-api.gametest', 'true'
+            runDir 'build/run/gameTest'
+        }
+    }
 }
 
 dependencies {
@@ -68,6 +79,7 @@ dependencies {
     // libraries it builds against: architectury FluidStack API + taffy UI layout engine.
     modImplementation files(project.ldlib2_fabric_jar)
     modImplementation "curse.maven:architectury-api-419699:5786326"
+    modImplementation "net.fabricmc:fabric-language-kotlin:${project.fabric_language_kotlin_version}"
     // taffy/yoga ride inside the LDLib2 jar (it includes them as nested jars), so they are
     // compile/runtime deps here only — no second `include`, or the same nested jar ships twice.
     implementation "dev.vfyjxf:taffy:1.1.4"

@@ -12,6 +12,7 @@ import com.lowdragmc.kilagraph.blueprint.nodes.mc.id.McIdNodes;
 import com.lowdragmc.kilagraph.blueprint.nodes.mc.item.ItemStackNodes;
 import com.lowdragmc.kilagraph.blueprint.nodes.mc.nbt.NbtKeysNode;
 import com.lowdragmc.kilagraph.graph.exec.GraphExecutor;
+import com.lowdragmc.kilagraph.util.FluidUnits;
 import com.lowdragmc.kilagraph.graph.type.Vectors;
 import com.lowdragmc.lowdraglib2.nodegraphtookit.api.node.Node;
 import com.lowdragmc.lowdraglib2.nodegraphtookit.model.node.NodeModel;
@@ -295,7 +296,9 @@ public final class McDecomposeGameTest implements FabricGameTest {
 
     @GameTest(template = "kilagraph:empty")
     public static void fluidStackUnpackAndBucket(GameTestHelper helper) {
-        var n = probe(FluidNodes.Unpack.class, "stack", FluidStack.create(Fluids.WATER, 250));
+        // a graph-produced stack carries 250 mB as droplets internally
+        var n = probe(FluidNodes.Unpack.class, "stack",
+                FluidStack.create(Fluids.WATER, FluidUnits.mbToDroplets(250)));
         assertEq(helper, "fluid", Fluids.WATER, n.eval("fluid", Fluid.class));
         assertEq(helper, "amount", 250, n.eval("amount", Integer.class).intValue());
         assertFalse(helper, "not empty", n.eval("empty", Boolean.class));
