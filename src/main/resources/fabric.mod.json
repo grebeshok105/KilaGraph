@@ -109,7 +109,8 @@
     "fabricloader": ">=${loader_version}",
     "minecraft": "~${minecraft_version}",
     "fabric-api": "*",
-    "ldlib2": "*",
+    "architectury": "*",
+    "ldlib2": "${ldlib2_version_range}",
     "java": ">=21"
   }
 }
